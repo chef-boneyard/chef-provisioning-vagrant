@@ -83,7 +83,7 @@ module ChefMetalVagrant
     #           -- forwarded_ports: hash with key as guest_port => host_port
     #
     def acquire_machine(action_handler, node)
-      # Set up the modified node data
+      # Set up the provisioner output
       provisioner_options = node['normal']['provisioner_options']
       vm_name = node['name']
       old_provisioner_output = node['normal']['provisioner_output']
@@ -99,50 +99,12 @@ module ChefMetalVagrant
       # over (perhaps introduce a boolean that will force a delete and recreate
       # in such a case)
 
-      # Determine contents of vm file
-      vm_file_content = "Vagrant.configure('2') do |outer_config|\n"
-      vm_file_content << "  outer_config.vm.define #{vm_name.inspect} do |config|\n"
-      merged_vagrant_options = { 'vm.hostname' => node['name'] }
-      merged_vagrant_options.merge!(provisioner_options['vagrant_options']) if provisioner_options['vagrant_options']
-      merged_vagrant_options.each_pair do |key, value|
-        vm_file_content << "    config.#{key} = #{value.inspect}\n"
-      end
-      vm_file_content << provisioner_options['vagrant_config'] if provisioner_options['vagrant_config']
-      vm_file_content << "  end\nend\n"
-
-      # Set up vagrant file
-      vm_file = ChefMetal.inline_resource(action_handler) do
-        file provisioner_output['vm_file_path'] do
-          content vm_file_content
-          action :create
-        end
-      end
-
-      # Check current status of vm
-      current_status = vagrant_status(vm_name)
-      up_timeout = provisioner_options['up_timeout'] || 10*60
-
-      if current_status != 'running'
-        # Run vagrant up if vm is not running
-        action_handler.perform_action "run vagrant up #{vm_name} (status was '#{current_status}')" do
-          result = shell_out("vagrant up #{vm_name}", :cwd => cluster_path, :timeout => up_timeout)
-          if result.exitstatus != 0
-            raise "vagrant up #{vm_name} failed!\nSTDOUT:#{result.stdout}\nSTDERR:#{result.stderr}"
-          end
-          parse_vagrant_up(result.stdout, node)
-        end
-      elsif vm_file.updated_by_last_action?
-        # Run vagrant reload if vm is running and vm file changed
-        action_handler.perform_action "run vagrant reload #{vm_name}" do
-          result = shell_out("vagrant reload #{vm_name}", :cwd => cluster_path, :timeout => up_timeout)
-          if result.exitstatus != 0
-            raise "vagrant reload #{vm_name} failed!\nSTDOUT:#{result.stdout}\nSTDERR:#{result.stderr}"
-          end
-          parse_vagrant_up(result.stdout, node)
-        end
-      end
-
-      # Create machine object for callers to use
+      #
+      # This is where the work gets done:
+      # Create the .vm file, start the vm, and return the Machine
+      #
+      vm_file = create_vm_file(action_handler, vm_name, provisioner_output['vm_file_path'], provisioner_options)
+      start_machine(action_handler, vm_name, vm_file, provisioner_output, provisioner_options['up_timeout'])
       machine_for(node)
     end
 
@@ -214,18 +176,65 @@ module ChefMetalVagrant
       "vagrant_cluster://#{action_handler.node['name']}#{cluster_path}"
     end
 
-    def parse_vagrant_up(output, node)
+    def create_vm_file(action_handler, vm_name, vm_file_path, provisioner_options)
+      # Determine contents of vm file
+      vm_file_content = "Vagrant.configure('2') do |outer_config|\n"
+      vm_file_content << "  outer_config.vm.define #{vm_name.inspect} do |config|\n"
+      merged_vagrant_options = { 'vm.hostname' => vm_name }
+      merged_vagrant_options.merge!(provisioner_options['vagrant_options']) if provisioner_options['vagrant_options']
+      merged_vagrant_options.each_pair do |key, value|
+        vm_file_content << "    config.#{key} = #{value.inspect}\n"
+      end
+      vm_file_content << provisioner_options['vagrant_config'] if provisioner_options['vagrant_config']
+      vm_file_content << "  end\nend\n"
+
+      # Set up vagrant file
+      ChefMetal.inline_resource(action_handler) do
+        file vm_file_path do
+          content vm_file_content
+          action :create
+        end
+      end
+    end
+
+    def start_machine(action_handler, vm_name, vm_file, provisioner_output, up_timeout)
+      # Check current status of vm
+      current_status = vagrant_status(vm_name)
+      up_timeout ||= 10*60
+
+      if current_status != 'running'
+        # Run vagrant up if vm is not running
+        action_handler.perform_action "run vagrant up #{vm_name} (status was '#{current_status}')" do
+          result = shell_out("vagrant up #{vm_name}", :cwd => cluster_path, :timeout => up_timeout)
+          if result.exitstatus != 0
+            raise "vagrant up #{vm_name} failed!\nSTDOUT:#{result.stdout}\nSTDERR:#{result.stderr}"
+          end
+          parse_vagrant_up(result.stdout, provisioner_output)
+        end
+      elsif vm_file.updated_by_last_action?
+        # Run vagrant reload if vm is running and vm file changed
+        action_handler.perform_action "run vagrant reload #{vm_name}" do
+          result = shell_out("vagrant reload #{vm_name}", :cwd => cluster_path, :timeout => up_timeout)
+          if result.exitstatus != 0
+            raise "vagrant reload #{vm_name} failed!\nSTDOUT:#{result.stdout}\nSTDERR:#{result.stderr}"
+          end
+          parse_vagrant_up(result.stdout, provisioner_output)
+        end
+      end
+    end
+
+    def parse_vagrant_up(output, provisioner_output)
       # Grab forwarded port info
+      provisioner_output['forwarded_ports'] = {}
       in_forwarding_ports = false
       output.lines.each do |line|
         if in_forwarding_ports
           if line =~ /-- (\d+) => (\d+)/
-            node['normal']['provisioner_output']['forwarded_ports'][$1] = $2
+            provisioner_output['forwarded_ports'][$1] = $2
           else
             in_forwarding_ports = false
           end
         elsif line =~ /Forwarding ports...$/
-          node['normal']['provisioner_output']['forwarded_ports'] = {}
           in_forwarding_ports = true
         end
       end
