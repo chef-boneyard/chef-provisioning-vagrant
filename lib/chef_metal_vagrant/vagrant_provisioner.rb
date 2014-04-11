@@ -55,7 +55,7 @@ module ChefMetalVagrant
     #        instead of options provided by the provisioner.  TODO compare and
     #        fail if different?
     #        node will have node['normal']['provisioner_options'] in it with any options.
-    #        It is a hash with this format:
+    #        It is a hash with this format (all keys are strings):
     #
     #           -- provisioner_url: vagrant:<cluster_path>
     #           -- vagrant_options: hash of properties of the "config"
@@ -71,6 +71,8 @@ module ChefMetalVagrant
     #                is detected.
     #           -- up_timeout: maximum time, in seconds, to wait for vagrant
     #              to bring up the machine.  Defaults to 10 minutes.
+    #           -- chef_client_timeout: maximum time, in seconds, to wait for chef-client
+    #              to complete.  0 or nil for no timeout.  Defaults to 2 hours.
     #
     #        node['normal']['provisioner_output'] will be populated with information
     #        about the created machine.  For vagrant, it is a hash with this
@@ -251,11 +253,17 @@ module ChefMetalVagrant
     def convergence_strategy_for(node)
       if vagrant_option(node, 'vm.guest').to_s == 'windows'
         @windows_convergence_strategy ||= begin
-          ChefMetal::ConvergenceStrategy::InstallMsi.new
+          options = {}
+          provisioner_options = node['normal']['provisioner_options'] || {}
+          options[:chef_client_timeout] = provisioner_options['chef_client_timeout'] if provisioner_options.has_key?('chef_client_timeout')
+          ChefMetal::ConvergenceStrategy::InstallMsi.new(options)
         end
       else
         @unix_convergence_strategy ||= begin
-          ChefMetal::ConvergenceStrategy::InstallCached.new
+          options = {}
+          provisioner_options = node['normal']['provisioner_options'] || {}
+          options[:chef_client_timeout] = provisioner_options['chef_client_timeout'] if provisioner_options.has_key?('chef_client_timeout')
+          ChefMetal::ConvergenceStrategy::InstallCached.new(options)
         end
       end
     end
