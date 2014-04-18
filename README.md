@@ -1,3 +1,3 @@
-# chef-metal-fog
+# chef-metal-vagrant
 
-This is the Fog provisioner for chef-metal.  It provides EC2, DigitalOcean and Openstack functionality.
+This is the Vagrant provisioner for chef-metal.
