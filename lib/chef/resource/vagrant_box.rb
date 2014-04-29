@@ -13,6 +13,6 @@ class Chef::Resource::VagrantBox < Chef::Resource::LWRPBase
 
   def after_created
     super
-    ChefMetal.with_vagrant_box self
+    ChefMetalVagrant.with_vagrant_box run_context, self
   end
 end

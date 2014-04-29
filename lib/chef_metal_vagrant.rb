@@ -5,12 +5,8 @@ require 'chef/resource/vagrant_box'
 require 'chef/provider/vagrant_box'
 require 'chef_metal_vagrant/vagrant_provisioner'
 
-module ChefMetal
-  def self.with_vagrant_cluster(cluster_path, &block)
-    with_provisioner(ChefMetalVagrant::VagrantProvisioner.new(cluster_path), &block)
-  end
-
-  def self.with_vagrant_box(box_name, provisioner_options = nil, &block)
+module ChefMetalVagrant
+  def self.with_vagrant_box(run_context, box_name, vagrant_options = {}, &block)
     if box_name.is_a?(Chef::Resource::VagrantBox)
       provisioner_options ||= box_name.provisioner_options || {}
       provisioner_options['vagrant_options'] ||= {}
@@ -22,18 +18,18 @@ module ChefMetal
       provisioner_options['vagrant_options']['vm.box'] = box_name
     end
 
-    with_provisioner_options(provisioner_options, &block)
+    run_context.chef_metal.with_provisioner_options(provisioner_options, &block)
   end
 end
 
 class Chef
   class Recipe
     def with_vagrant_cluster(cluster_path, &block)
-      ChefMetal.with_vagrant_cluster(cluster_path, &block)
+      with_provisioner(ChefMetalVagrant::VagrantProvisioner.new(cluster_path), &block)
     end
 
     def with_vagrant_box(box_name, vagrant_options = {}, &block)
-      ChefMetal.with_vagrant_box(box_name, vagrant_options, &block)
+      ChefMetalVagrant.with_vagrant_box(run_context, box_name, vagrant_options, &block)
     end
   end
 end
