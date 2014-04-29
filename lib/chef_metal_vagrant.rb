@@ -8,17 +8,13 @@ require 'chef_metal_vagrant/vagrant_provisioner'
 module ChefMetalVagrant
   def self.with_vagrant_box(run_context, box_name, vagrant_options = {}, &block)
     if box_name.is_a?(Chef::Resource::VagrantBox)
-      provisioner_options ||= box_name.provisioner_options || {}
-      provisioner_options['vagrant_options'] ||= {}
-      provisioner_options['vagrant_options']['vm.box'] = box_name.name
-      provisioner_options['vagrant_options']['vm.box_url'] = box_name.url if box_name.url
+      new_options = { 'vagrant_options' => { 'vm.box' => box_name.name } }
+      new_options['vagrant_options']['vm.box_url'] = box_name.url if box_name.url
     else
-      provisioner_options ||= {}
-      provisioner_options['vagrant_options'] ||= {}
-      provisioner_options['vagrant_options']['vm.box'] = box_name
+      new_options = { 'vagrant_options' => { 'vm.box' => box_name } }
     end
 
-    run_context.chef_metal.with_provisioner_options(provisioner_options, &block)
+    run_context.chef_metal.add_provisioner_options(new_options, &block)
   end
 end
 
