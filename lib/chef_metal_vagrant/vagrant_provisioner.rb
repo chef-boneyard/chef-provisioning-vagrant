@@ -90,7 +90,7 @@ module ChefMetalVagrant
       vm_name = node['name']
       old_provisioner_output = node['normal']['provisioner_output']
       node['normal']['provisioner_output'] = provisioner_output = {
-        'provisioner_url' => provisioner_url(action_handler),
+        'provisioner_url' => provisioner_url(vm_name),
         'vm_name' => vm_name,
         'vm_file_path' => File.join(cluster_path, "#{vm_name}.vm")
       }
@@ -174,8 +174,8 @@ module ChefMetalVagrant
 
     protected
 
-    def provisioner_url(action_handler)
-      "vagrant_cluster://#{action_handler.node['name']}#{cluster_path}"
+    def provisioner_url(vm_name)
+      "vagrant_cluster://#{vm_name}#{cluster_path}"
     end
 
     def create_vm_file(action_handler, vm_name, vm_file_path, provisioner_options)
