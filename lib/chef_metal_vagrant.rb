@@ -19,13 +19,15 @@ module ChefMetalVagrant
 end
 
 class Chef
-  class Recipe
-    def with_vagrant_cluster(cluster_path, &block)
-      with_provisioner(ChefMetalVagrant::VagrantProvisioner.new(cluster_path), &block)
-    end
+  module DSL
+    module Recipe
+      def with_vagrant_cluster(cluster_path, &block)
+        with_provisioner(ChefMetalVagrant::VagrantProvisioner.new(cluster_path), &block)
+      end
 
-    def with_vagrant_box(box_name, vagrant_options = {}, &block)
-      ChefMetalVagrant.with_vagrant_box(run_context, box_name, vagrant_options, &block)
+      def with_vagrant_box(box_name, vagrant_options = {}, &block)
+        ChefMetalVagrant.with_vagrant_box(run_context, box_name, vagrant_options, &block)
+      end
     end
   end
 end
