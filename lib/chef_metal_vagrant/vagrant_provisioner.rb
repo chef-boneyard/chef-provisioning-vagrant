@@ -105,8 +105,8 @@ module ChefMetalVagrant
       # This is where the work gets done:
       # Create the .vm file, start the vm, and return the Machine
       #
-      vm_file = create_vm_file(action_handler, vm_name, provisioner_output['vm_file_path'], provisioner_options)
-      start_machine(action_handler, vm_name, vm_file, provisioner_output, provisioner_options['up_timeout'])
+      vm_file_updated = create_vm_file(action_handler, vm_name, provisioner_output['vm_file_path'], provisioner_options)
+      start_machine(action_handler, vm_name, vm_file_updated, provisioner_output, provisioner_options['up_timeout'])
       machine_for(node)
     end
 
@@ -199,7 +199,7 @@ module ChefMetalVagrant
       end
     end
 
-    def start_machine(action_handler, vm_name, vm_file, provisioner_output, up_timeout)
+    def start_machine(action_handler, vm_name, vm_file_updated, provisioner_output, up_timeout)
       # Check current status of vm
       current_status = vagrant_status(vm_name)
       up_timeout ||= 10*60
@@ -213,7 +213,7 @@ module ChefMetalVagrant
           end
           parse_vagrant_up(result.stdout, provisioner_output)
         end
-      elsif vm_file.updated_by_last_action?
+      elsif vm_file_updated
         # Run vagrant reload if vm is running and vm file changed
         action_handler.perform_action "run vagrant reload #{vm_name}" do
           result = shell_out("vagrant reload #{vm_name}", :cwd => cluster_path, :timeout => up_timeout)
