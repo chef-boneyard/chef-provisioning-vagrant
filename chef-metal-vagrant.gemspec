@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.version = ChefMetalVagrant::VERSION
   s.platform = Gem::Platform::RUBY
   s.extra_rdoc_files = ['README.md', 'LICENSE' ]
-  s.summary = 'Provisioner for creating Vagrant instances in Chef Metal.'
+  s.summary = 'Driver for creating Vagrant instances in Chef Metal.'
   s.description = s.summary
   s.author = 'John Keiser'
   s.email = 'jkeiser@getchef.com'

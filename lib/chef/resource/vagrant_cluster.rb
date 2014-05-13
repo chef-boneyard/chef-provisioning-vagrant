@@ -11,6 +11,6 @@ class Chef::Resource::VagrantCluster < Chef::Resource::LWRPBase
 
   def after_created
     super
-    run_context.chef_metal.with_provisioner ChefMetalVagrant::VagrantProvisioner.new(path)
+    run_context.chef_metal.with_driver "vagrant:#{path}"
   end
 end

@@ -1,9 +1,7 @@
 require 'chef/provider/lwrp_base'
-require 'chef_metal/provider_action_handler'
+require 'cheffish'
 
 class Chef::Provider::VagrantCluster < Chef::Provider::LWRPBase
-
-  include ChefMetal::ProviderActionHandler
 
   use_inline_resources
 
@@ -13,7 +11,7 @@ class Chef::Provider::VagrantCluster < Chef::Provider::LWRPBase
 
   action :create do
     the_base_path = new_resource.path
-    ChefMetal.inline_resource(self) do
+    Cheffish.inline_resource(self) do
       directory the_base_path
       file ::File.join(the_base_path, 'Vagrantfile') do
         content <<EOM
@@ -27,7 +25,7 @@ EOM
 
   action :delete do
     the_base_path = new_resource.path
-    ChefMetal.inline_resource(self) do
+    Cheffish.inline_resource(self) do
       file ::File.join(the_base_path, 'Vagrantfile') do
         action :delete
       end
