@@ -335,9 +335,9 @@ module ChefMetalVagrant
         elsif update_file
           update_names.push(vm_name)
         end
-        # Can only use one...  Just grab the first one that's actually set, if any
-        up_timeout ||= all_timeouts[vm_name]
       end
+      # Can only use one...  We'll grab the highest
+      up_timeout = all_timeouts.values.compact.max
       up_timeout ||= 10*60
       up_provisioner_outputs = {}
       update_provisioner_outputs = {}
