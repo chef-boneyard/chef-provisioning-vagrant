@@ -355,7 +355,7 @@ module ChefMetalVagrant
           result = shell_out("vagrant up --parallel #{names}", :cwd => cluster_path,
             :timeout => up_timeout)
           if result.exitstatus != 0
-            raise "vagrant up #{vm_name} failed!\nSTDOUT:#{result.stdout}\nSTDERR:#{result.stderr}"
+            raise "vagrant up #{names} failed!\nSTDOUT:#{result.stdout}\nSTDERR:#{result.stderr}"
           end
           parse_multi_vagrant_up(result.stdout, up_provisioner_outputs)
         end
