@@ -164,6 +164,7 @@ module ChefMetalVagrant
       all_names = []
       all_files = []
       all_outputs = {}
+      all_timeouts = {}
       nodes_json.each do |node|
         # Set up the provisioner output
         provisioner_options = node['normal']['provisioner_options']
@@ -182,9 +183,9 @@ module ChefMetalVagrant
           provisioner_output['vm_file_path'], provisioner_options)
         all_files.push(vm_file_updated)
         all_outputs[vm_name] = provisioner_output
+        all_timeouts[vm_name] = provisioner_options['up_timeout']
       end
-      start_machines(action_handler, all_names, all_files, all_outputs,
-        provisioner_options['up_timeout'])
+      start_machines(action_handler, all_names, all_files, all_outputs, all_timeouts)
       nodes_json.map do |node|
         machine_for(node)
       end
@@ -320,8 +321,7 @@ module ChefMetalVagrant
       end
     end
 
-    def start_machines(action_handler, all_names, all_files, all_outputs, up_timeout)
-      up_timeout ||= 10*60
+    def start_machines(action_handler, all_names, all_files, all_outputs, all_timeouts)
       up_names = []
       up_status = []
       update_names = []
@@ -332,10 +332,13 @@ module ChefMetalVagrant
         if current_status != 'running'
           up_names.push(vm_name)
           up_status.push(current_status)
-        elseif update_file
+        elsif update_file
           update_names.push(vm_name)
         end
+        # Can only use one...  Just grab the first one that's actually set, if any
+        up_timeout ||= all_timeouts[vm_name]
       end
+      up_timeout ||= 10*60
       up_provisioner_outputs = {}
       update_provisioner_outputs = {}
       up_names.each do |name|
