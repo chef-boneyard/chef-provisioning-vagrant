@@ -32,6 +32,9 @@ module ChefMetalVagrant
       VagrantDriver.new("vagrant:#{cluster_path}", config)
     end
 
+    # Acquire a machine, generally by provisioning it. Returns a Machine
+    # object pointing at the machine, allowing useful actions like setup,
+    # converge, execute, file and directory.
     def allocate_machine(action_handler, machine_spec, machine_options)
       # Set up the driver output
       vm_name = machine_spec.name
@@ -47,6 +50,7 @@ module ChefMetalVagrant
           'allocated_at' => Time.now.utc.to_s,
           'host_node' => action_handler.host_node
         }
+        machine_spec.location['needs_reload'] = true if vm_file_updated
         if machine_options[:vagrant_options]
           %w(vm.guest winrm.host winrm.port winrm.username winrm.password).each do |key|
             machine_spec.location[key] = machine_options[:vagrant_options][key] if machine_options[:vagrant_options][key]
@@ -56,63 +60,17 @@ module ChefMetalVagrant
       end
     end
 
-    # Acquire a machine, generally by provisioning it.  Returns a Machine
-    # object pointing at the machine, allowing useful actions like setup,
-    # converge, execute, file and directory.  The Machine object will have a
-    # "node" property which must be saved to the server (if it is any
-    # different from the original node object).
-    #
-    # ## Parameters
-    # action_handler - the action_handler object that is calling this method; this
-    #        is generally a action_handler, but could be anything that can support the
-    #        ChefMetal::ActionHandler interface (i.e., in the case of the test
-    #        kitchen metal driver for acquiring and destroying VMs; see the base
-    #        class for what needs providing).
-    # node - node object (deserialized json) representing this machine.  If
-    #        the node has a driver_options hash in it, these will be used
-    #        instead of options provided by the driver.  TODO compare and
-    #        fail if different?
-    #        node will have node['normal']['driver_options'] in it with any options.
-    #        It is a hash with this format (all keys are strings):
-    #
-    #           -- driver_url: vagrant:<cluster_path>
-    #           -- vagrant_options: hash of properties of the "config"
-    #              object, i.e. "vm.box" => "ubuntu12" and "vm.box_url"
-    #           -- vagrant_config: string containing other vagrant config.
-    #              Should assume the variable "config" represents machine config.
-    #              Will be written verbatim into the vm's Vagrantfile.
-    #           -- transport_options: hash of options specifying the transport.
-    #                :type => :ssh
-    #                :type => :winrm
-    #                If not specified, ssh is used unless vm.guest is :windows.  If that is
-    #                the case, the windows options are used and the port forward for 5985
-    #                is detected.
-    #           -- up_timeout: maximum time, in seconds, to wait for vagrant
-    #              to bring up the machine.  Defaults to 10 minutes.
-    #           -- chef_client_timeout: maximum time, in seconds, to wait for chef-client
-    #              to complete.  0 or nil for no timeout.  Defaults to 2 hours.
-    #
-    #        node['normal']['driver_output'] will be populated with information
-    #        about the created machine.  For vagrant, it is a hash with this
-    #        format:
-    #
-    #           -- driver_url: vagrant_cluster://<current_node>/<cluster_path>
-    #           -- vm_name: name of vagrant vm created
-    #           -- vm_file_path: path to machine-specific vagrant config file
-    #              on disk
-    #           -- forwarded_ports: hash with key as guest_port => host_port
-    #
     def ready_machine(action_handler, machine_spec, machine_options)
       start_machine(action_handler, machine_spec, machine_options)
-      machine_for(machine_spec)
+      machine_for(machine_spec, machine_options)
     end
 
     # Connect to machine without acquiring it
-    def connect_to_machine(machine_spec)
-      machine_for(machine_spec)
+    def connect_to_machine(machine_spec, machine_options)
+      machine_for(machine_spec, machine_options)
     end
 
-    def delete_machine(action_handler, machine_spec)
+    def destroy_machine(action_handler, machine_spec, machine_options)
       if machine_spec.location
         vm_name = machine_spec.location['vm_name']
         current_status = vagrant_status(vm_name)
@@ -125,8 +83,8 @@ module ChefMetalVagrant
           end
         end
 
-        convergence_strategy_for(machine_spec).cleanup_convergence(action_handler,
-          machine_spec)
+        convergence_strategy_for(machine_spec, machine_options).
+          cleanup_convergence(action_handler, machine_spec)
 
         vm_file_path = machine_spec.location['vm_file_path']
         ChefMetal.inline_resource(action_handler) do
@@ -137,7 +95,7 @@ module ChefMetalVagrant
       end
     end
 
-    def stop_machine(action_handler, machine_spec)
+    def stop_machine(action_handler, machine_spec, machine_options)
       if machine_spec.location
         vm_name = machine_spec.location['vm_name']
         current_status = vagrant_status(vm_name)
@@ -152,53 +110,27 @@ module ChefMetalVagrant
       end
     end
 
-    def acquire_machines(action_handler, nodes_json, parallelizer)
-      all_names = []
-      all_files = []
-      all_outputs = {}
-      all_timeouts = {}
-      nodes_json.each do |node|
-        # Set up the provisioner output
-        provisioner_options = node['normal']['provisioner_options']
-        vm_name = node['name']
-        all_names.push(vm_name)
-        old_provisioner_output = node['normal']['provisioner_output']
-        node['normal']['provisioner_output'] = provisioner_output = {
-          'provisioner_url' => provisioner_url(vm_name),
-          'vm_name' => vm_name,
-          'vm_file_path' => File.join(cluster_path, "#{vm_name}.vm")
-        }
-        # Preserve existing forwarded ports
-        provisioner_output['forwarded_ports'] =
-          old_provisioner_output['forwarded_ports'] if old_provisioner_output
-        vm_file_updated = create_vm_file(action_handler, vm_name,
-          provisioner_output['vm_file_path'], provisioner_options)
-        all_files.push(vm_file_updated)
-        all_outputs[vm_name] = provisioner_output
-        all_timeouts[vm_name] = provisioner_options['up_timeout']
+    def ready_machines(action_handler, specs_and_options, parallelizer)
+      start_machines(action_handler, specs_and_options)
+      machines = []
+      specs_and_options.each_pair do |spec, options|
+        machines.push(machine_for(spec, options))
       end
-      start_machines(action_handler, all_names, all_files, all_outputs, all_timeouts)
-      nodes_json.map do |node|
-        machine_for(node)
-      end
+      machines
     end
 
-    def delete_machines(action_handler, nodes_json, parallelizer)
+    def destroy_machines(action_handler, specs_and_options, parallelizer)
       all_names = []
       all_status = []
       all_outputs = {}
-      nodes_json.each do |node|
-        if node['normal'] && node['normal']['provisioner_output']
-          provisioner_output = node['normal']['provisioner_output']
-        else
-          provisioner_output = {}
-        end
-        all_outputs[node['name']] = provisioner_output
-        vm_name = provisioner_output['vm_name'] || node['name']
-        current_status = vagrant_status(vm_name)
-        if current_status != 'not created'
-          all_names.push(vm_name)
-          all_status.push(current_status)
+      specs_and_options.each_key do |spec|
+        if spec.location
+          vm_name = spec.location['vm_name']
+          current_status = vagrant_status(vm_name)
+          if current_status != 'not created'
+            all_names.push(vm_name)
+            all_status.push(current_status)
+          end
         end
       end
       if all_names.length > 0
@@ -211,11 +143,11 @@ module ChefMetalVagrant
           end
         end
       end
-      nodes_json.each do |node|
-        convergence_strategy_for(node).cleanup_convergence(action_handler, node)
-        provisioner_output = all_outputs[node['name']]
-        vm_file_path = provisioner_output['vm_file_path'] ||
-          File.join(cluster_path, "#{vm_name}.vm")
+      specs_and_options.each_pair do |spec, options|
+        convergence_strategy_for(spec, options).
+          cleanup_convergence(action_handler, spec)
+
+        vm_file_path = spec.location['vm_file_path']
         ChefMetal.inline_resource(action_handler) do
           file vm_file_path do
             action :delete
@@ -224,18 +156,15 @@ module ChefMetalVagrant
       end
     end
 
-    def stop_machines(action_handler, nodes_json, parallelizer)
+    def stop_machines(action_handler, specs_and_options, parallelizer)
       all_names = []
-      nodes_json.each do |node|
-        if node['normal'] && node['normal']['provisioner_output']
-          provisioner_output = node['normal']['provisioner_output']
-        else
-          provisioner_output = {}
-        end
-        vm_name = provisioner_output['vm_name'] || node['name']
-        current_status = vagrant_status(vm_name)
-        if current_status == 'running'
-          all_names.push(vm_name)
+      specs_and_options.each_key do |spec|
+        if spec.location
+          vm_name = spec.location['vm_name']
+          current_status = vagrant_status(vm_name)
+          if current_status == 'running'
+            all_names.push(vm_name)
+          end
         end
       end
       if all_names.length > 0
@@ -292,6 +221,8 @@ module ChefMetalVagrant
       up_timeout = machine_options[:up_timeout] || 10*60
 
       current_status = vagrant_status(vm_name)
+      vm_file_updated = machine_spec.location['needs_reload']
+      machine_spec.location['needs_reload'] = false
       if current_status != 'running'
         # Run vagrant up if vm is not running
         action_handler.perform_action "run vagrant up #{vm_name} (status was '#{current_status}')" do
@@ -315,32 +246,33 @@ module ChefMetalVagrant
       end
     end
 
-    def start_machines(action_handler, all_names, all_files, all_outputs, all_timeouts)
+    def start_machines(action_handler, specs_and_options)
       up_names = []
       up_status = []
+      up_specs = {}
       update_names = []
-      all_names.each do |vm_name|
-        # this should work as long as host names are unique o_O
-        update_file = all_files[all_names.index(vm_name)]
+      update_specs = {}
+      timeouts = []
+      specs_and_options.each_pair do |spec, options|
+        vm_name = spec.location['vm_name']
+
+        vm_file_updated = spec.location['needs_reload']
+        spec.location['needs_reload'] = false
+
         current_status = vagrant_status(vm_name)
         if current_status != 'running'
           up_names.push(vm_name)
           up_status.push(current_status)
-        elsif update_file
+          up_specs[vm_name] = spec
+        elsif vm_file_updated
           update_names.push(vm_name)
+          update_specs[vm_name] = spec
         end
+        timeouts.push(options[:up_timeout])
       end
-      # Can only use one...  We'll grab the highest
+      # Use the highest timeout, if any exist
       up_timeout = all_timeouts.values.compact.max
       up_timeout ||= 10*60
-      up_provisioner_outputs = {}
-      update_provisioner_outputs = {}
-      up_names.each do |name|
-        up_provisioner_outputs[name] = all_outputs[name]
-      end
-      update_names.each do |name|
-        update_provisioner_outputs[name] = all_outputs[name]
-      end
       if up_names.length > 0
         # Run vagrant up if vm is not running
         names = up_names.join(" ")
@@ -351,7 +283,7 @@ module ChefMetalVagrant
           if result.exitstatus != 0
             raise "vagrant up #{names} failed!\nSTDOUT:#{result.stdout}\nSTDERR:#{result.stderr}"
           end
-          parse_multi_vagrant_up(result.stdout, up_provisioner_outputs)
+          parse_multi_vagrant_up(result.stdout, up_specs)
         end
       end
       if update_names.length > 0
@@ -363,7 +295,7 @@ module ChefMetalVagrant
           if result.exitstatus != 0
             raise "vagrant reload #{names} failed!\nSTDOUT:#{result.stdout}\nSTDERR:#{result.stderr}"
           end
-          parse_multi_vagrant_up(result.stdout, update_provisioner_outputs)
+          parse_multi_vagrant_up(result.stdout, update_specs)
         end
       end
     end
@@ -385,12 +317,11 @@ module ChefMetalVagrant
       end
     end
 
-    def parse_multi_vagrant_up(output, all_outputs)
+    def parse_multi_vagrant_up(output, all_machine_specs)
       # Grab forwarded port info
       in_forwarding_ports = {}
-      all_outputs.each_key do |key|
-        provisioner_output = all_outputs[key]
-        provisioner_output['forwarded_ports'] = {}        
+      all_outputs.each_key do |key, spec|
+        spec.location['forwarded_ports'] = {}        
         in_forwarding_ports[key] = false
       end
       output.lines.each do |line|
@@ -398,8 +329,8 @@ module ChefMetalVagrant
         node_name = $1
         if in_forwarding_ports[node_name]
           if line =~ /-- (\d+) => (\d+)/
-            provisioner_output = all_outputs[node_name]
-            provisioner_output['forwarded_ports'][$1] = $2
+            spec = all_outputs[node_name]
+            spec.location['forwarded_ports'][$1] = $2
           else
             in_forwarding_ports[node_name] = false
           end
@@ -407,31 +338,28 @@ module ChefMetalVagrant
           in_forwarding_ports[node_name] = true
         end
       end
-      # Aw, geez, what do we do here?
     end
 
-    def machine_for(machine_spec)
+    def machine_for(machine_spec, machine_options)
       if machine_spec.location['vm.guest'].to_s == 'windows'
         ChefMetal::Machine::WindowsMachine.new(machine_spec, transport_for(machine_spec),
-          convergence_strategy_for(machine_spec))
+          convergence_strategy_for(machine_spec, machine_options))
       else
         ChefMetal::Machine::UnixMachine.new(machine_spec, transport_for(machine_spec),
-          convergence_strategy_for(machine_spec))
+          convergence_strategy_for(machine_spec, machine_options))
       end
     end
 
-    def convergence_strategy_for(machine_spec)
+    def convergence_strategy_for(machine_spec, machine_options)
       if machine_spec.location['vm.guest'].to_s == 'windows'
         @windows_convergence_strategy ||= begin
-          options = {}
-          options[:chef_client_timeout] = machine_spec.location['chef_client_timeout'] if machine_spec.location['chef_client_timeout']
-          ChefMetal::ConvergenceStrategy::InstallMsi.new(options)
+          ChefMetal::ConvergenceStrategy::InstallMsi.
+                                              new(machine_options[:convergence_options])
         end
       else
         @unix_convergence_strategy ||= begin
-          options = {}
-          options[:chef_client_timeout] = machine_spec.location['chef_client_timeout'] if machine_spec.location['chef_client_timeout']
-          ChefMetal::ConvergenceStrategy::InstallCached.new(options)
+          ChefMetal::ConvergenceStrategy::InstallCached.
+                                           new(machine_options[:convergence_options])
         end
       end
     end
