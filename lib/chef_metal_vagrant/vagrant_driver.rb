@@ -27,7 +27,9 @@ module ChefMetalVagrant
     attr_reader :cluster_path
 
     def self.from_url(driver_url, config)
-      VagrantDriver.new(driver_url, config)
+      scheme, cluster_path = driver_url.split(':', 2)
+      cluster_path = File.expand_path(cluster_path)
+      VagrantDriver.new("vagrant:#{cluster_path}", config)
     end
 
     def allocate_machine(action_handler, machine_spec, machine_options)
@@ -161,7 +163,7 @@ module ChefMetalVagrant
     end
 
     def driver_url
-      "vagrant_cluster:#{cluster_path}"
+      "vagrant:#{cluster_path}"
     end
 
     protected
