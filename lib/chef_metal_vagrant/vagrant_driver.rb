@@ -6,6 +6,7 @@ require 'chef_metal/convergence_strategy/install_msi'
 require 'chef_metal/convergence_strategy/install_cached'
 require 'chef_metal/transport/winrm'
 require 'chef_metal/transport/ssh'
+require 'chef_metal_vagrant/version'
 
 module ChefMetalVagrant
   # Provisions machines in vagrant.
@@ -36,10 +37,10 @@ module ChefMetalVagrant
     # object pointing at the machine, allowing useful actions like setup,
     # converge, execute, file and directory.
     def allocate_machine(action_handler, machine_spec, machine_options)
-      # Set up the driver output
       vm_name = machine_spec.name
       vm_file_path = File.join(cluster_path, "#{machine_spec.name}.vm")
-      vm_file_updated = create_vm_file(action_handler, vm_name, vm_file_path)
+      vm_file_updated = create_vm_file(action_handler, vm_name, vm_file_path,
+        machine_options)
       if vm_file_updated || !machine_spec.location
         old_location = machine_spec.location
         machine_spec.location = {
@@ -195,16 +196,16 @@ module ChefMetalVagrant
 
     protected
 
-    def create_vm_file(action_handler, vm_name, vm_file_path)
+    def create_vm_file(action_handler, vm_name, vm_file_path, machine_options)
       # Determine contents of vm file
       vm_file_content = "Vagrant.configure('2') do |outer_config|\n"
       vm_file_content << "  outer_config.vm.define #{vm_name.inspect} do |config|\n"
       merged_vagrant_options = { 'vm.hostname' => vm_name }
-      merged_vagrant_options.merge!(driver_options[:vagrant_options]) if driver_options[:vagrant_options]
+      merged_vagrant_options.merge!(machine_options[:vagrant_options]) if machine_options[:vagrant_options]
       merged_vagrant_options.each_pair do |key, value|
         vm_file_content << "    config.#{key} = #{value.inspect}\n"
       end
-      vm_file_content << driver_options[:vagrant_config] if driver_options[:vagrant_config]
+      vm_file_content << machine_options[:vagrant_config] if machine_options[:vagrant_config]
       vm_file_content << "  end\nend\n"
 
       # Set up vagrant file

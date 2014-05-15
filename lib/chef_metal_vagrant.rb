@@ -8,10 +8,10 @@ require 'chef_metal_vagrant/vagrant_driver'
 module ChefMetalVagrant
   def self.with_vagrant_box(run_context, box_name, vagrant_options = {}, &block)
     if box_name.is_a?(Chef::Resource::VagrantBox)
-      new_options = { 'vagrant_options' => { 'vm.box' => box_name.name } }
-      new_options['vagrant_options']['vm.box_url'] = box_name.url if box_name.url
+      new_options = { :vagrant_options => { 'vm.box' => box_name.name } }
+      new_options[:vagrant_options]['vm.box_url'] = box_name.url if box_name.url
     else
-      new_options = { 'vagrant_options' => { 'vm.box' => box_name } }
+      new_options = { :vagrant_options => { 'vm.box' => box_name } }
     end
 
     run_context.chef_metal.add_machine_options(new_options, &block)
