@@ -321,8 +321,8 @@ module ChefMetalVagrant
     def parse_multi_vagrant_up(output, all_machine_specs)
       # Grab forwarded port info
       in_forwarding_ports = {}
-      all_machine_specs.each_key do |key, spec|
-        spec.location['forwarded_ports'] = {}        
+      all_machine_specs.each_pair do |key, spec|
+        spec.location['forwarded_ports'] = {}
         in_forwarding_ports[key] = false
       end
       output.lines.each do |line|
@@ -330,7 +330,7 @@ module ChefMetalVagrant
         node_name = $1
         if in_forwarding_ports[node_name]
           if line =~ /-- (\d+) => (\d+)/
-            spec = all_outputs[node_name]
+            spec = all_machine_specs[node_name]
             spec.location['forwarded_ports'][$1] = $2
           else
             in_forwarding_ports[node_name] = false
