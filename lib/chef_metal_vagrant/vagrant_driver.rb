@@ -272,7 +272,7 @@ module ChefMetalVagrant
         timeouts.push(options[:up_timeout])
       end
       # Use the highest timeout, if any exist
-      up_timeout = all_timeouts.values.compact.max
+      up_timeout = timeouts.compact.max
       up_timeout ||= 10*60
       if up_names.length > 0
         # Run vagrant up if vm is not running
@@ -321,7 +321,7 @@ module ChefMetalVagrant
     def parse_multi_vagrant_up(output, all_machine_specs)
       # Grab forwarded port info
       in_forwarding_ports = {}
-      all_outputs.each_key do |key, spec|
+      all_machine_specs.each_key do |key, spec|
         spec.location['forwarded_ports'] = {}        
         in_forwarding_ports[key] = false
       end
