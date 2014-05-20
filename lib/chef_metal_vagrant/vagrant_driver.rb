@@ -7,6 +7,8 @@ require 'chef_metal/convergence_strategy/install_cached'
 require 'chef_metal/transport/winrm'
 require 'chef_metal/transport/ssh'
 require 'chef_metal_vagrant/version'
+require 'chef/resource/vagrant_cluster'
+require 'chef/provider/vagrant_cluster'
 
 module ChefMetalVagrant
   # Provisions machines in vagrant.
@@ -29,7 +31,7 @@ module ChefMetalVagrant
 
     def self.from_url(driver_url, config)
       scheme, cluster_path = driver_url.split(':', 2)
-      cluster_path = File.expand_path(cluster_path)
+      cluster_path = File.expand_path(cluster_path || File.join(Chef::Config.config_dir, 'vms'))
       VagrantDriver.new("vagrant:#{cluster_path}", config)
     end
 
@@ -37,10 +39,10 @@ module ChefMetalVagrant
     # object pointing at the machine, allowing useful actions like setup,
     # converge, execute, file and directory.
     def allocate_machine(action_handler, machine_spec, machine_options)
+      ensure_vagrant_cluster(action_handler)
       vm_name = machine_spec.name
       vm_file_path = File.join(cluster_path, "#{machine_spec.name}.vm")
-      vm_file_updated = create_vm_file(action_handler, vm_name, vm_file_path,
-        machine_options)
+      vm_file_updated = create_vm_file(action_handler, vm_name, vm_file_path, machine_options)
       if vm_file_updated || !machine_spec.location
         old_location = machine_spec.location
         machine_spec.location = {
@@ -195,6 +197,13 @@ module ChefMetalVagrant
     end
 
     protected
+
+    def ensure_vagrant_cluster(action_handler)
+      _cluster_path = cluster_path
+      ChefMetal.inline_resource(action_handler) do
+        vagrant_cluster _cluster_path
+      end
+    end
 
     def create_vm_file(action_handler, vm_name, vm_file_path, machine_options)
       # Determine contents of vm file
