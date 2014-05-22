@@ -1,3 +1,3 @@
 # chef-metal-vagrant
 
-This is the Vagrant provisioner for chef-metal.
+This is the Vagrant driver for chef-metal.
