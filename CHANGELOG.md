@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.beta (5/23/2014)
+
+- Adjust to new chef-metal Driver interface
+
 ## 0.3.1 (5/1/2014)
 
 - chef-metal 0.10 bugfixes
