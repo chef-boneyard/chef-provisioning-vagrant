@@ -210,7 +210,9 @@ module ChefMetalVagrant
       vm_file_content = "Vagrant.configure('2') do |outer_config|\n"
       vm_file_content << "  outer_config.vm.define #{vm_name.inspect} do |config|\n"
       merged_vagrant_options = { 'vm.hostname' => vm_name }
-      merged_vagrant_options.merge!(machine_options[:vagrant_options]) if machine_options[:vagrant_options]
+      if machine_options[:vagrant_options]
+        merged_vagrant_options = Cheffish::MergedConfig.new(machine_options[:vagrant_options], merged_vagrant_options)
+      end
       merged_vagrant_options.each_pair do |key, value|
         vm_file_content << "    config.#{key} = #{value.inspect}\n"
       end
@@ -364,12 +366,12 @@ module ChefMetalVagrant
       if machine_spec.location['vm.guest'].to_s == 'windows'
         @windows_convergence_strategy ||= begin
           ChefMetal::ConvergenceStrategy::InstallMsi.
-                                              new(machine_options[:convergence_options])
+                                              new(machine_options[:convergence_options], config)
         end
       else
         @unix_convergence_strategy ||= begin
           ChefMetal::ConvergenceStrategy::InstallCached.
-                                           new(machine_options[:convergence_options])
+                                           new(machine_options[:convergence_options], config)
         end
       end
     end
