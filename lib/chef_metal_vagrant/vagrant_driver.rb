@@ -39,7 +39,6 @@ module ChefMetalVagrant
       "vagrant:#{cluster_path}"
     end
 
-
     # Acquire a machine, generally by provisioning it. Returns a Machine
     # object pointing at the machine, allowing useful actions like setup,
     # converge, execute, file and directory.
@@ -122,7 +121,9 @@ module ChefMetalVagrant
       start_machines(action_handler, specs_and_options)
       machines = []
       specs_and_options.each_pair do |spec, options|
-        machines.push(machine_for(spec, options))
+        machine = machine_for(spec, options)
+        machines << machine
+        yield machine if block_given?
       end
       machines
     end
@@ -152,8 +153,7 @@ module ChefMetalVagrant
         end
       end
       specs_and_options.each_pair do |spec, options|
-        convergence_strategy_for(spec, options).
-          cleanup_convergence(action_handler, spec)
+        convergence_strategy_for(spec, options).cleanup_convergence(action_handler, spec)
 
         vm_file_path = spec.location['vm_file_path']
         ChefMetal.inline_resource(action_handler) do
@@ -161,6 +161,7 @@ module ChefMetalVagrant
             action :delete
           end
         end
+        yield spec if block_given?
       end
     end
 
