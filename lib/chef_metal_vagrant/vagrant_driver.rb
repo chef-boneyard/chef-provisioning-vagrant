@@ -30,10 +30,15 @@ module ChefMetalVagrant
     attr_reader :cluster_path
 
     def self.from_url(driver_url, config)
+      VagrantDriver.new(driver_url, config)
+    end
+
+    def self.canonicalize_url(driver_url, config)
       scheme, cluster_path = driver_url.split(':', 2)
       cluster_path = File.expand_path(cluster_path || File.join(Chef::Config.config_dir, 'vms'))
-      VagrantDriver.new("vagrant:#{cluster_path}", config)
+      "vagrant:#{cluster_path}"
     end
+
 
     # Acquire a machine, generally by provisioning it. Returns a Machine
     # object pointing at the machine, allowing useful actions like setup,
