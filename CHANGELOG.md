@@ -1,7 +1,12 @@
 # Changelog
 
+## 0.4.beta.2 (5/30/2014)
+
+- fix parallelization to yield properly for machine_batch
+
 ## 0.4.beta (5/23/2014)
 
+- @doubt72 Explicitly supported parallelization
 - Adjust to new chef-metal Driver interface
 
 ## 0.3.1 (5/1/2014)
