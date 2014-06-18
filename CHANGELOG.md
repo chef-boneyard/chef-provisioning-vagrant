@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5 (6/18/2014)
+
+- add dependency on chef-metal (now that chef-metal doesn't bring in chef-metal-vagrant by default)
+
 ## 0.4 (6/3/2014)
 
 - @doubt72 Explicitly supported parallelization
