@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6 (8/18/2014)
+
+- Fix windows client (was not eating \r and doing Bad Things)
+
 ## 0.5 (6/18/2014)
 
 - add dependency on chef-metal (now that chef-metal doesn't bring in chef-metal-vagrant by default)
