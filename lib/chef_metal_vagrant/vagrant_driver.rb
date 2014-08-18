@@ -392,7 +392,7 @@ module ChefMetalVagrant
 
     def vagrant_status(name)
       status_output = shell_out("vagrant status #{name}", :cwd => cluster_path).stdout
-      if status_output =~ /^#{name}\s+([^\n]+)\s+\(([^\n]+)\)$/m
+      if status_output =~ /^#{name}\s+(.+)\s+\((.+)\)$/
         $1
       else
         'not created'
@@ -441,7 +441,7 @@ module ChefMetalVagrant
       result = shell_out("vagrant ssh-config #{machine_spec.location['vm_name']}",
         :cwd => cluster_path)
       result.stdout.lines.inject({}) do |result, line|
-        line =~ /^\s*(\S+)\s+(.+)/
+        line =~ /^\s*(\S+)\s+(.+?)(\r\n|\r|\n|\z)/
         vagrant_ssh_config[$1] = $2
       end
       vagrant_ssh_config
