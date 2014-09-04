@@ -13,4 +13,9 @@ class Chef::Resource::VagrantCluster < Chef::Resource::LWRPBase
     super
     run_context.chef_metal.with_driver "vagrant:#{path}"
   end
+
+  # We are not interested in Chef's cloning behavior here.
+  def load_prior_resource
+    Chef::Log.debug("Overloading #{resource_name}.load_prior_resource with NOOP")
+  end
 end
