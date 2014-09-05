@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1 (9/5/2014)
+
+- minor fix to prevent issues with vagrant_box specified twice
+
 ## 0.6 (8/18/2014)
 
 - Fix windows client (was not eating \r and doing Bad Things)
