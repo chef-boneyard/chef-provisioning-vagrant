@@ -219,9 +219,11 @@ module ChefMetalVagrant
       if machine_options[:vagrant_options]
         merged_vagrant_options = Cheffish::MergedConfig.new(machine_options[:vagrant_options], merged_vagrant_options)
       end
-      merged_vagrant_options.each_pair do |key, value|
-        vm_file_content << "    config.#{key} = #{value.inspect}\n"
-      end
+      normal_options, special_options = transform_vagrant_options(merged_vagrant_options)
+      vm_file_content << normal_options.join("\n")
+      vm_file_content << "\n"
+      vm_file_content << special_options.join("\n")
+      vm_file_content << "\n"
       vm_file_content << machine_options[:vagrant_config] if machine_options[:vagrant_config]
       vm_file_content << "  end\nend\n"
 
@@ -232,6 +234,42 @@ module ChefMetalVagrant
           action :create
         end
       end
+    end
+
+    # Vagrantfiles are Ruby DSL. Some directive uses '=' methods, and others do not.
+    # This method transforms the merged vagrant options and pulls out directives that
+    # are not simple assignments and transforms them into valid configuration options.
+    # The method will return an array:
+    # [ normal_config_options,
+    #   special_config_options ]
+    # The generated code won't be pretty, but it will be valid Ruby
+    SPECIAL_VAGRANT_OPTION_KEYS = %w(vm.synced_folder vm.network)
+    def transform_vagrant_options(merged_options)
+      normal_options = []
+      special_options = []
+
+      merged_options.to_a.each do |(key, value)|
+        if SPECIAL_VAGRANT_OPTION_KEYS.include?(key)
+          args = value.map(&method(:transform_to_ruby)).join(', ')
+          special_options << "    config.#{key}(#{args})"
+        else
+          normal_options  << "    config.#{key} = #{value.inspect}"
+        end
+      end
+      return [normal_options, special_options]
+    end
+
+    def transform_to_ruby(object)
+      case object
+      when Hash then transform_to_ruby_hash(object)
+      else
+        object.inspect
+      end
+    end
+
+    def transform_to_ruby_hash(hash)
+      h = hash.map { |(k,v)| "#{k}: #{transform_to_ruby(v)}" }.join(', ')
+      "{ #{h} }"
     end
 
     def start_machine(action_handler, machine_spec, machine_options)
