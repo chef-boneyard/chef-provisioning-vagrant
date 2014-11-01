@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7 (11/1/2014)
+
+- rename to chef-provisioning-vagrant
+
 ## 0.6.1 (9/5/2014)
 
 - minor fix to prevent issues with vagrant_box specified twice

@@ -6,13 +6,15 @@ require 'chef_metal/convergence_strategy/install_msi'
 require 'chef_metal/convergence_strategy/install_cached'
 require 'chef_metal/transport/winrm'
 require 'chef_metal/transport/ssh'
-require 'chef_metal_vagrant/version'
+require 'chef/provisioning/vagrant_driver/version'
 require 'chef/resource/vagrant_cluster'
 require 'chef/provider/vagrant_cluster'
 
-module ChefMetalVagrant
+class Chef
+module Provisioning
+module VagrantDriver
   # Provisions machines in vagrant.
-  class VagrantDriver < ChefMetal::Driver
+  class Driver < ChefMetal::Driver
 
     include Chef::Mixin::ShellOut
 
@@ -30,7 +32,7 @@ module ChefMetalVagrant
     attr_reader :cluster_path
 
     def self.from_url(driver_url, config)
-      VagrantDriver.new(driver_url, config)
+      Driver.new(driver_url, config)
     end
 
     def self.canonicalize_url(driver_url, config)
@@ -51,7 +53,7 @@ module ChefMetalVagrant
         old_location = machine_spec.location
         machine_spec.location = {
           'driver_url' => driver_url,
-          'driver_version' => ChefMetalVagrant::VERSION,
+          'driver_version' => Chef::Provisioning::VagrantDriver::VERSION,
           'vm_name' => vm_name,
           'vm_file_path' => vm_file_path,
           'allocated_at' => Time.now.utc.to_s,
@@ -464,4 +466,6 @@ module ChefMetalVagrant
       end
     end
   end
+end
+end
 end

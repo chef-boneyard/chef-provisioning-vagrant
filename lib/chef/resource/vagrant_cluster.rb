@@ -1,5 +1,5 @@
 require 'chef/resource/lwrp_base'
-require 'chef_metal_vagrant'
+require 'chef/provisioning/vagrant_driver'
 
 class Chef::Resource::VagrantCluster < Chef::Resource::LWRPBase
   self.resource_name = 'vagrant_cluster'

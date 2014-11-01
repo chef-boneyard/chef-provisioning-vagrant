@@ -1,5 +1,5 @@
 require 'chef/resource/lwrp_base'
-require 'chef_metal_vagrant'
+require 'chef/provisioning/vagrant_driver'
 
 class Chef::Resource::VagrantBox < Chef::Resource::LWRPBase
   self.resource_name = 'vagrant_box'
@@ -13,7 +13,7 @@ class Chef::Resource::VagrantBox < Chef::Resource::LWRPBase
 
   def after_created
     super
-    ChefMetalVagrant.with_vagrant_box run_context, self
+    Chef::Provisioning::VagrantDriver.with_vagrant_box run_context, self
   end
 
   # We are not interested in Chef's cloning behavior here.
