@@ -2,18 +2,18 @@ $:.unshift(File.dirname(__FILE__) + '/lib')
 require 'chef/provisioning/vagrant_driver/version'
 
 Gem::Specification.new do |s|
-  s.name = 'chef-metal-vagrant'
+  s.name = 'chef-provisioning-vagrant'
   s.version = Chef::Provisioning::VagrantDriver::VERSION
   s.platform = Gem::Platform::RUBY
   s.extra_rdoc_files = ['README.md', 'LICENSE' ]
-  s.summary = 'Driver for creating Vagrant instances in Chef Metal.'
+  s.summary = 'Driver for creating Vagrant instances in Chef Provisioning.'
   s.description = s.summary
   s.author = 'John Keiser'
   s.email = 'jkeiser@getchef.com'
-  s.homepage = 'https://github.com/opscode/chef-metal-fog'
+  s.homepage = 'https://github.com/opscode/chef-provisioning-vagrant'
 
   s.add_dependency 'chef'
-  s.add_dependency 'chef-metal', '~> 0.12'
+  s.add_dependency 'chef-provisioning', '~> 0.15'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rake'
