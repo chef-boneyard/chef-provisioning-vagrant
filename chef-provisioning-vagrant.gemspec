@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/opscode/chef-provisioning-vagrant'
 
   s.add_dependency 'chef'
-  s.add_dependency 'chef-metal', '~> 0.12'
+  s.add_dependency 'chef-provisioning', '~> 0.15'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rake'
