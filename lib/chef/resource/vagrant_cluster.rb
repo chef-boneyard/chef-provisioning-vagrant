@@ -11,7 +11,7 @@ class Chef::Resource::VagrantCluster < Chef::Resource::LWRPBase
 
   def after_created
     super
-    run_context.chef_metal.with_driver "vagrant:#{path}"
+    run_context.chef_provisioning.with_driver "vagrant:#{path}"
   end
 
   # We are not interested in Chef's cloning behavior here.

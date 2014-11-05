@@ -1,4 +1,4 @@
-require 'chef_metal'
+require 'chef/provisioning'
 require 'chef/resource/vagrant_cluster'
 require 'chef/provider/vagrant_cluster'
 require 'chef/resource/vagrant_box'
@@ -16,7 +16,7 @@ class Chef
           new_options = { :vagrant_options => { 'vm.box' => box_name } }
         end
 
-        run_context.chef_metal.add_machine_options(new_options, &block)
+        run_context.chef_provisioning.add_machine_options(new_options, &block)
       end
     end
   end

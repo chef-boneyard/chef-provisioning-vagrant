@@ -1,11 +1,11 @@
 require 'chef/mixin/shell_out'
-require 'chef_metal/driver'
-require 'chef_metal/machine/windows_machine'
-require 'chef_metal/machine/unix_machine'
-require 'chef_metal/convergence_strategy/install_msi'
-require 'chef_metal/convergence_strategy/install_cached'
-require 'chef_metal/transport/winrm'
-require 'chef_metal/transport/ssh'
+require 'chef/provisioning/driver'
+require 'chef/provisioning/machine/windows_machine'
+require 'chef/provisioning/machine/unix_machine'
+require 'chef/provisioning/convergence_strategy/install_msi'
+require 'chef/provisioning/convergence_strategy/install_cached'
+require 'chef/provisioning/transport/winrm'
+require 'chef/provisioning/transport/ssh'
 require 'chef/provisioning/vagrant_driver/version'
 require 'chef/resource/vagrant_cluster'
 require 'chef/provider/vagrant_cluster'
@@ -14,7 +14,7 @@ class Chef
 module Provisioning
 module VagrantDriver
   # Provisions machines in vagrant.
-  class Driver < ChefMetal::Driver
+  class Driver < Chef::Provisioning::Driver
 
     include Chef::Mixin::ShellOut
 
@@ -96,7 +96,7 @@ module VagrantDriver
           cleanup_convergence(action_handler, machine_spec)
 
         vm_file_path = machine_spec.location['vm_file_path']
-        ChefMetal.inline_resource(action_handler) do
+        Chef::Provisioning.inline_resource(action_handler) do
           file vm_file_path do
             action :delete
           end
@@ -158,7 +158,7 @@ module VagrantDriver
         convergence_strategy_for(spec, options).cleanup_convergence(action_handler, spec)
 
         vm_file_path = spec.location['vm_file_path']
-        ChefMetal.inline_resource(action_handler) do
+        Chef::Provisioning.inline_resource(action_handler) do
           file vm_file_path do
             action :delete
           end
@@ -208,7 +208,7 @@ module VagrantDriver
 
     def ensure_vagrant_cluster(action_handler)
       _cluster_path = cluster_path
-      ChefMetal.inline_resource(action_handler) do
+      Chef::Provisioning.inline_resource(action_handler) do
         vagrant_cluster _cluster_path
       end
     end
@@ -228,7 +228,7 @@ module VagrantDriver
       vm_file_content << "  end\nend\n"
 
       # Set up vagrant file
-      ChefMetal.inline_resource(action_handler) do
+      Chef::Provisioning.inline_resource(action_handler) do
         file vm_file_path do
           content vm_file_content
           action :create
@@ -362,10 +362,10 @@ module VagrantDriver
 
     def machine_for(machine_spec, machine_options)
       if machine_spec.location['vm.guest'].to_s == 'windows'
-        ChefMetal::Machine::WindowsMachine.new(machine_spec, transport_for(machine_spec),
+        Chef::Provisioning::Machine::WindowsMachine.new(machine_spec, transport_for(machine_spec),
           convergence_strategy_for(machine_spec, machine_options))
       else
-        ChefMetal::Machine::UnixMachine.new(machine_spec, transport_for(machine_spec),
+        Chef::Provisioning::Machine::UnixMachine.new(machine_spec, transport_for(machine_spec),
           convergence_strategy_for(machine_spec, machine_options))
       end
     end
@@ -373,12 +373,12 @@ module VagrantDriver
     def convergence_strategy_for(machine_spec, machine_options)
       if machine_spec.location['vm.guest'].to_s == 'windows'
         @windows_convergence_strategy ||= begin
-          ChefMetal::ConvergenceStrategy::InstallMsi.
+          Chef::Provisioning::ConvergenceStrategy::InstallMsi.
                                               new(machine_options[:convergence_options], config)
         end
       else
         @unix_convergence_strategy ||= begin
-          ChefMetal::ConvergenceStrategy::InstallCached.
+          Chef::Provisioning::ConvergenceStrategy::InstallCached.
                                            new(machine_options[:convergence_options], config)
         end
       end
@@ -416,7 +416,7 @@ module VagrantDriver
         :disable_sspi => true
       }
 
-      ChefMetal::Transport::WinRM.new(endpoint, type, options)
+      Chef::Provisioning::Transport::WinRM.new(endpoint, type, options)
     end
 
     def create_ssh_transport(machine_spec)
@@ -435,7 +435,7 @@ module VagrantDriver
       options = {
         :prefix => 'sudo '
       }
-      ChefMetal::Transport::SSH.new(hostname, username, ssh_options, options, config)
+      Chef::Provisioning::Transport::SSH.new(hostname, username, ssh_options, options, config)
     end
 
     def vagrant_ssh_config_for(machine_spec)
