@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8 (11/5/2014)
+
+- Work with Chef 12
+
 ## 0.7 (11/1/2014)
 
 - rename to chef-provisioning-vagrant
