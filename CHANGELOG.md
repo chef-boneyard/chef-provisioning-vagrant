@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1 (11/5/2014)
+
+- Fixes to work with chef-provisioning gem
+
 ## 0.8 (11/5/2014)
 
 - Work with Chef 12
