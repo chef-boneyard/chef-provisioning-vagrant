@@ -394,7 +394,7 @@ module VagrantDriver
 
     def vagrant_status(name)
       status_output = shell_out("vagrant status #{name}", :cwd => cluster_path).stdout
-      if status_output =~ /^#{name}\s+(.+)\s+\((.+)\)$/
+      if status_output =~ /^#{name}\s+(.+)\s+\((.+)\)/
         $1
       else
         'not created'
