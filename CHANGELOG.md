@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.2 (2/25/2014)
+
+- Get Vagrant driver running on Windows clients (@kramvan1)
+
 ## 0.8.1 (11/5/2014)
 
 - Fixes to work with chef-provisioning gem
