@@ -1,6 +1,7 @@
 # Changelog
 
-## 0.8.2 (2/25/2014)
+## 0.8.3 (4/2/2015)
+## 0.8.2 (2/25/2015)
 
 - Get Vagrant driver running on Windows clients (@kramvan1)
 
