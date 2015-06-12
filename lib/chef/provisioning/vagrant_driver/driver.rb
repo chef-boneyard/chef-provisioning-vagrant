@@ -222,7 +222,11 @@ module VagrantDriver
         merged_vagrant_options = Cheffish::MergedConfig.new(machine_options[:vagrant_options], merged_vagrant_options)
       end
       merged_vagrant_options.each_pair do |key, value|
-        vm_file_content << "    config.#{key} = #{value.inspect}\n"
+        if key == 'vm.network'
+          vm_file_content << "    config.#{key}(#{value})\n"
+        else
+          vm_file_content << "    config.#{key} = #{value.inspect}\n"
+        end
       end
       vm_file_content << machine_options[:vagrant_config] if machine_options[:vagrant_config]
       vm_file_content << "  end\nend\n"
