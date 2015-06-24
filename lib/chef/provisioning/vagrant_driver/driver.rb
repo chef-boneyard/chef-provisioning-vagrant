@@ -376,15 +376,11 @@ module VagrantDriver
 
     def convergence_strategy_for(machine_spec, machine_options)
       if machine_spec.location['vm.guest'].to_s == 'windows'
-        @windows_convergence_strategy ||= begin
-          Chef::Provisioning::ConvergenceStrategy::InstallMsi.
-                                              new(machine_options[:convergence_options], config)
-        end
+        Chef::Provisioning::ConvergenceStrategy::InstallMsi.
+                                            new(machine_options[:convergence_options], config)
       else
-        @unix_convergence_strategy ||= begin
-          Chef::Provisioning::ConvergenceStrategy::InstallCached.
-                                           new(machine_options[:convergence_options], config)
-        end
+        Chef::Provisioning::ConvergenceStrategy::InstallCached.
+                                         new(machine_options[:convergence_options], config)
       end
     end
 

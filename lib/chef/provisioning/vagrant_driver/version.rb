@@ -1,7 +1,7 @@
 class Chef
-module Provisioning
-module VagrantDriver
-  VERSION = '0.8.3'
-end
-end
+  module Provisioning
+    module VagrantDriver
+      VERSION = '0.8.4'
+    end
+  end
 end

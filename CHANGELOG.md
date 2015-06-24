@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.4 (4/2/2015)
+
+- Do not remember convergance_strategy for every machine. (@afiune)
+
 ## 0.8.3 (4/2/2015)
 ## 0.8.2 (2/25/2015)
 
