@@ -15,13 +15,13 @@ vagrant_box 'opscode-centos-6.4' do
   vagrant_provider 'vmware_desktop'
 end
 ```
-This example will use the vmware_desktop/fusion based box that already exists on your system, and will fail if the box does not exist. **Note: since bento boxes appear as 'vmware_desktop', 'vmware_fusion' will not work here**
+This example will ensure that the vmware_desktop/fusion based box exists on your system, and will fail if the box does not exist. If this fails, you can always add the URL source as per the previous example. **Note: since bento boxes appear as 'vmware_desktop', 'vmware_fusion' will not work here**
 ```
 vagrant_box 'custom_box' do
   vagrant_provider 'vmware_desktop'
 end
 ```
-This example will use the default virtualbox based box that already exists on your system, and will fail if the box does not exist.
+This example will ensure that the virtualbox based box already exists on your system, and will fail if the box does not exist. As before, adding the URL will cause it to download the box.
 ```
 vagrant_box 'custom_box'
 ```
@@ -54,7 +54,7 @@ machine 'marley' do
   converge true
 end
 ```
-**Note: even though the bento based boxes appear as 'vmware_desktop', 'vmware_fusion' is required here, as it is the name of the virtualbox provider**
+**Note: even though the bento based boxes appear as 'vmware_desktop', 'vmware_fusion' is required here, as it is the name of the vagrant provider**
 
 # Known Issues
 It would be really nice to do some magic to make the vmware_fusion vs vmware_desktop providers match in the machine_options and the vagrant_box resource, but some magic would happen there...
