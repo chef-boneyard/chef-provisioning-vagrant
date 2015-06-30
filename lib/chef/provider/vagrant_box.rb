@@ -12,10 +12,10 @@ class Chef::Provider::VagrantBox < Chef::Provider::LWRPBase
   end
 
   action :create do
-    if !list_boxes.has_key?(new_resource.name)
+    if !box_exists?(new_resource)
       if new_resource.url
-        converge_by "run 'vagrant box add #{new_resource.name} #{new_resource.url}'" do
-          shell_out("vagrant box add #{new_resource.name} #{new_resource.url}").error!
+        converge_by "run 'vagrant box add #{new_resource.name} #{new_resource.url} --provider #{new_resource.vagrant_provider}'" do
+          shell_out("vagrant box add #{new_resource.name} #{new_resource.url} --provider #{new_resource.vagrant_provider}").error!
         end
       else
         raise "Box #{new_resource.name} does not exist"
@@ -24,19 +24,33 @@ class Chef::Provider::VagrantBox < Chef::Provider::LWRPBase
   end
 
   action :delete do
-    if list_boxes.has_key?(new_resource.name)
-      converge_by "run 'vagrant box remove #{new_resource.name} #{list_boxes[new_resource.name]}'" do
-        shell_out("vagrant box remove #{new_resource.name} #{list_boxes[new_resource.name]}").error!
+    if box_exists?(new_resource.name)
+      converge_by "run 'vagrant box remove #{new_resource.name} #{list_boxes[new_resource.name]} --provider #{new_resource.vagrant_provider}'" do
+        shell_out("vagrant box remove #{new_resource.name} #{list_boxes[new_resource.name]} --provider #{new_resource.vagrant_provider}").error!
       end
     end
   end
 
+  # Since all box names must be unique for a particular vagrant provider, this hash now
+  # keys off the provider name, as opposed to the box name. The version is not currently
+  # used, but is collected as metadata for future consumption
   def list_boxes
     @list_boxes ||= shell_out("vagrant box list").stdout.lines.inject({}) do |result, line|
-      line =~ /^(\S+)\s+\((.+)\)\s*$/
-      result[$1] = $2
+      line =~ /^(\S+)\s+\((.+),(.+)\)\s*$/
+      if result.has_key?($2)
+        result[$2][$1] = $3
+      else
+        result[$2] = { $1 => $3 }
+      end
       result
     end
+  end
+
+  # In some rather strained logic, we hook into the vagrant provider, then
+  # the box name to make sure we have the correct box already installed.
+  def box_exists?(new_resource)
+    boxes = list_boxes
+    boxes[new_resource.vagrant_provider].has_key?(new_resource.name)
   end
 
   def load_current_resource

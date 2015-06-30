@@ -12,6 +12,7 @@ class Chef
         if box_name.is_a?(Chef::Resource::VagrantBox)
           new_options = { :vagrant_options => { 'vm.box' => box_name.name } }
           new_options[:vagrant_options]['vm.box_url'] = box_name.url if box_name.url
+          new_options[:vagrant_provider] = box_name.vagrant_provider
         else
           new_options = { :vagrant_options => { 'vm.box' => box_name } }
         end

@@ -192,7 +192,6 @@ class Chef
         # Used by vagrant_cluster and machine to get the string used to configure vagrant
         def self.vagrant_config_string(vagrant_config, variable, line_prefix)
           hostname = name.gsub(/[^A-Za-z0-9\-]/, '-')
-
           result = ''
           vagrant_config.each_pair do |key, value|
             result += "#{line_prefix}#{variable}.#{key} = #{value.inspect}\n"
@@ -242,18 +241,18 @@ class Chef
 
         def start_machine(action_handler, machine_spec, machine_options)
           vm_name = machine_spec.location['vm_name']
+          vm_provider = machine_options.has_key?(:vagrant_provider) ? machine_options[:vagrant_provider] : 'virtualbox'
           up_timeout = machine_options[:up_timeout] || 10*60
-
           current_status = vagrant_status(vm_name)
           vm_file_updated = machine_spec.location['needs_reload']
           machine_spec.location['needs_reload'] = false
           if current_status != 'running'
             # Run vagrant up if vm is not running
-            action_handler.perform_action "run vagrant up #{vm_name} (status was '#{current_status}')" do
-              result = shell_out("vagrant up #{vm_name}", :cwd => cluster_path,
+            action_handler.perform_action "run vagrant up #{vm_name} --provider #{vm_provider} (status was '#{current_status}')" do
+              result = shell_out("vagrant up #{vm_name} --provider #{vm_provider}", :cwd => cluster_path,
                 :timeout => up_timeout)
               if result.exitstatus != 0
-                raise "vagrant up #{vm_name} failed!\nSTDOUT:#{result.stdout}\nSTDERR:#{result.stderr}"
+                raise "vagrant up #{vm_name} --provider #{vm_provider} failed!\nSTDOUT:#{result.stdout}\nSTDERR:#{result.stderr}"
               end
               parse_vagrant_up(result.stdout, machine_spec)
             end
