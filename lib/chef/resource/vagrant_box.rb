@@ -9,6 +9,7 @@ class Chef::Resource::VagrantBox < Chef::Resource::LWRPBase
 
   attribute :name, :kind_of => String, :name_attribute => true
   attribute :url, :kind_of => String
+  attribute :vagrant_provider, :kind_of => String, :default => 'virtualbox'
   attribute :driver_options, :kind_of => Hash
 
   def after_created
