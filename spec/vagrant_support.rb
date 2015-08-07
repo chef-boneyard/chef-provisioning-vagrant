@@ -42,12 +42,3 @@ module VagrantSupport
     when_the_repository "exists and #{description}", *tags, &context_block
   end
 end
-
-# optional, I'm not sure where I cargo-culted this from.
-module VagrantConfig
-  def chef_config
-    @chef_config ||= {
-      driver: Chef::Provisioning.driver_for_url("vagrant"),
-    }
-  end
-end
