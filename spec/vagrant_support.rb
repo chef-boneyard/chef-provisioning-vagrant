@@ -1,3 +1,5 @@
+abort "ABORT: module VagrantSupport is deprecated. Please use the RSpec shared context instead."
+
 module VagrantSupport
 
   # your top-level context blocks will use this file like so:
@@ -42,3 +44,4 @@ module VagrantSupport
     when_the_repository "exists and #{description}", *tags, &context_block
   end
 end
+
