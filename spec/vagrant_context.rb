@@ -6,8 +6,5 @@ RSpec.shared_context "run with driver" do |driver_args|
 
   vagrant_driver = Chef::Provisioning.driver_for_url(driver_args[:driver_string])
 
-  # @@driver = vagrant_driver
-  # def self.driver
-  #   @@driver
-  # end
+  let(:provisioning_driver) { vagrant_driver }
 end
