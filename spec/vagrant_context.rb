@@ -8,7 +8,10 @@ RSpec.shared_context "run with driver" do |driver_args|
 
   let(:provisioning_driver) { driver_object }
 
-  def self.with_chef_server(&block)
-    when_the_chef_12_server "is running", server_scope: :context, port: 8900..9000, &block
+  def self.with_chef_server(*options, &block)
+    args = { server_scope: :context, port: 8900..9000 }
+    args = args.merge(options.last) if options.last.is_a?(Hash)
+
+    when_the_chef_12_server "is running", args, &block
   end
 end

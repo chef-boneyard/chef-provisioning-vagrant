@@ -13,7 +13,7 @@ describe "Chef::Provisioning::Vagrant" do
         }.not_to raise_error
       end
 
-      it "can use a let variable in a recipe" do
+      it "can use a let variable in a recipe, no matter what kind of RSpec-ception we engage in" do
         expect_converge {
           log "should be able to use let_var as '#{let_var}' with no error."
         }.not_to raise_error
