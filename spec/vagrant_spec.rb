@@ -22,6 +22,14 @@ describe "Chef::Provisioning::Vagrant" do
       it "has access to the driver object" do
         expect(provisioning_driver.driver_url).to start_with("vagrant:")
       end
+
+      it "has a running Chef-Zero server available" do
+        expect_recipe {
+          chef_data_bag "spec-#{Time.now.to_i}" do
+            action :delete
+          end
+        }.to be_truthy
+      end
     end
   end
 end
