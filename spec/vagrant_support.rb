@@ -1,3 +1,5 @@
+abort "ABORT: module VagrantSupport is deprecated. Please use the RSpec shared context instead."
+
 module VagrantSupport
 
   # your top-level context blocks will use this file like so:
@@ -43,11 +45,3 @@ module VagrantSupport
   end
 end
 
-# optional, I'm not sure where I cargo-culted this from.
-module VagrantConfig
-  def chef_config
-    @chef_config ||= {
-      driver: Chef::Provisioning.driver_for_url("vagrant"),
-    }
-  end
-end

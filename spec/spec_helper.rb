@@ -1,4 +1,4 @@
-require 'vagrant_support'
+require 'vagrant_context'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
@@ -18,4 +18,5 @@ RSpec.configure do |config|
 
   config.filter_run :focus
   config.run_all_when_everything_filtered = true
+  # config.include ChefServerInclude
 end

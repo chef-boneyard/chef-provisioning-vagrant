@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/chef/chef-provisioning-vagrant'
 
   s.add_dependency 'chef'
+  s.add_dependency 'cheffish', '>= 1.3.1'  # 1.3.1 adds ability to use let vars in specs.
   s.add_dependency 'chef-provisioning'
 
   s.add_development_dependency 'rspec'
