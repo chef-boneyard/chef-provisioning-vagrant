@@ -1,18 +1,26 @@
 describe "Chef::Provisioning::Vagrant" do
   include_context "run with driver", :driver_string => "vagrant"
 
-  when_the_chef_12_server "exists", server_scope: :context, port: 8900..9000 do
-    context "machine resource" do
+  with_chef_server do
+    context "the test environment" do
       let(:let_var) { "a let variable in the enclosing context"}
 
-      it "uses a Vagrant resource and a let variable" do
+      it "can use a Vagrant resource" do
         expect_converge {
           vagrant_box "should load the resource with no errors" do
             action :nothing
           end
+        }.not_to raise_error
+      end
 
+      it "can use a let variable in a recipe" do
+        expect_converge {
           log "should be able to use let_var as '#{let_var}' with no error."
         }.not_to raise_error
+      end
+
+      it "has access to the driver object" do
+        expect(provisioning_driver.driver_url).to start_with("vagrant:")
       end
     end
   end
