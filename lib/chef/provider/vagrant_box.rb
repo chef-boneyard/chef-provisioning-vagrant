@@ -50,7 +50,8 @@ class Chef::Provider::VagrantBox < Chef::Provider::LWRPBase
   # the box name to make sure we have the correct box already installed.
   def box_exists?(new_resource)
     boxes = list_boxes
-    boxes[new_resource.vagrant_provider].has_key?(new_resource.name)
+    provider = new_resource.vagrant_provider
+    boxes.has_key?(provider) && boxes[provider].has_key?(new_resource.name)
   end
 
   def load_current_resource
