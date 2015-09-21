@@ -212,6 +212,7 @@ class Chef
           end
         end
 
+
         def create_vm_file(action_handler, vm_name, vm_file_path, machine_options)
           # Determine contents of vm file
           vm_file_content = "Vagrant.configure('2') do |outer_config|\n"
@@ -222,7 +223,13 @@ class Chef
           end
           merged_vagrant_options.each_pair do |key, value|
             if key == 'vm.network'
-              vm_file_content << "    config.#{key}(#{value})\n"
+              if value.is_a? Array
+                value.each do |arr_val|
+                  vm_file_content << "    config.#{key}(#{arr_val})\n"
+                end
+              else
+                vm_file_content << "    config.#{key}(#{value})\n"
+              end
             else
               vm_file_content << "    config.#{key} = #{value.inspect}\n"
             end
