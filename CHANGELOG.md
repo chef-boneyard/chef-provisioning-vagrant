@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.0 (09/16/2015)
+
+- Make chef a development dependency.
+- Updated examples in README and added contributing documentation
+
 ## 0.9.0 (4/2/2015)
 
 - PR #19 - Allow use to specify `vm.network` for vagrant_options (@afiune)

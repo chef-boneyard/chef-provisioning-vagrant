@@ -12,9 +12,9 @@ Gem::Specification.new do |s|
   s.email = 'jkeiser@getchef.com'
   s.homepage = 'https://github.com/chef/chef-provisioning-vagrant'
 
-  s.add_dependency 'chef'
   s.add_dependency 'chef-provisioning'
 
+  s.add_development_dependency 'chef'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rake'
 
