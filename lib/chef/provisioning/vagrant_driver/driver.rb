@@ -223,12 +223,9 @@ class Chef
           end
           merged_vagrant_options.each_pair do |key, value|
             if key == 'vm.network'
-              if value.is_a? Array
-                value.each do |arr_val|
-                  vm_file_content << "    config.#{key}(#{arr_val})\n"
-                end
-              else
-                vm_file_content << "    config.#{key}(#{value})\n"
+              vm_networks = [value].flatten
+              vm_networks.each do |network|
+                vm_file_content << "    config.#{key}(#{network})\n"
               end
             else
               vm_file_content << "    config.#{key} = #{value.inspect}\n"
