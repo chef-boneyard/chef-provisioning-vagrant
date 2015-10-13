@@ -419,7 +419,7 @@ class Chef
             :disable_sspi => true
           }
 
-          Chef::Provisioning::Transport::WinRM.new(endpoint, type, options)
+          Chef::Provisioning::Transport::WinRM.new(endpoint, type, options, config)
         end
 
         def create_ssh_transport(machine_spec)
