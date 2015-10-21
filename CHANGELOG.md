@@ -1,58 +1,116 @@
-# Changelog
+# Change Log
 
-## 0.10.0 (09/16/2015)
+## [0.11.0](https://github.com/chef/chef-provisioning-vagrant/tree/0.11.0) (2015-10-21)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.10.0...0.11.0)
 
-- Make chef a development dependency.
-- Updated examples in README and added contributing documentation
+**Fixed bugs:**
 
-## 0.9.0 (4/2/2015)
+- Add gemspec files to allow bundler to run from the gem [\#36](https://github.com/chef/chef-provisioning-vagrant/pull/36) ([ksubrama](https://github.com/ksubrama))
+- Multi vm network values [\#34](https://github.com/chef/chef-provisioning-vagrant/pull/34) ([steversmith](https://github.com/steversmith))
 
-- PR #19 - Allow use to specify `vm.network` for vagrant_options (@afiune)
-- PR #20 - Do not remember convergance_strategy for every machine (@afiune)
-- PR #22 - Allow user to specify which vagrant provider to use (@scotthain)
+## [v0.10.0](https://github.com/chef/chef-provisioning-vagrant/tree/v0.10.0) (2015-09-16)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.9.0...v0.10.0)
 
-## 0.8.3 (4/2/2015)
-## 0.8.2 (2/25/2015)
+**Merged pull requests:**
 
-- Get Vagrant driver running on Windows clients (@kramvan1)
+- Make chef a development dependency [\#31](https://github.com/chef/chef-provisioning-vagrant/pull/31) ([ksubrama](https://github.com/ksubrama))
+- Adding a CONTRIBUTING document  [\#30](https://github.com/chef/chef-provisioning-vagrant/pull/30) ([tyler-ball](https://github.com/tyler-ball))
+- Add example forwarded\_port config in README [\#27](https://github.com/chef/chef-provisioning-vagrant/pull/27) ([danielsdeleo](https://github.com/danielsdeleo))
 
-## 0.8.1 (11/5/2014)
+## [v0.9.0](https://github.com/chef/chef-provisioning-vagrant/tree/v0.9.0) (2015-08-05)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.8.3...v0.9.0)
 
-- Fixes to work with chef-provisioning gem
+**Fixed bugs:**
 
-## 0.8 (11/5/2014)
+- Vagrant Provider Choice and Documentation [\#22](https://github.com/chef/chef-provisioning-vagrant/pull/22) ([scotthain](https://github.com/scotthain))
+- Do not remember convergence\_strategy for every machine [\#20](https://github.com/chef/chef-provisioning-vagrant/pull/20) ([afiune](https://github.com/afiune))
+- Add vm.network to driver create\_vm\_file [\#19](https://github.com/chef/chef-provisioning-vagrant/pull/19) ([afiune](https://github.com/afiune))
 
-- Work with Chef 12
+**Closed issues:**
 
-## 0.7 (11/1/2014)
+- Chef Provisioning- Vagrant \(Vagrant Config Issues\) [\#21](https://github.com/chef/chef-provisioning-vagrant/issues/21)
+- specify a provider to use [\#17](https://github.com/chef/chef-provisioning-vagrant/issues/17)
 
-- rename to chef-provisioning-vagrant
+**Merged pull requests:**
 
-## 0.6.1 (9/5/2014)
+- Initial .travis.yml. [\#25](https://github.com/chef/chef-provisioning-vagrant/pull/25) ([randomcamel](https://github.com/randomcamel))
 
-- minor fix to prevent issues with vagrant_box specified twice
+## [v0.8.3](https://github.com/chef/chef-provisioning-vagrant/tree/v0.8.3) (2015-04-02)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.8.2...v0.8.3)
 
-## 0.6 (8/18/2014)
+## [v0.8.2](https://github.com/chef/chef-provisioning-vagrant/tree/v0.8.2) (2015-02-26)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.8.1...v0.8.2)
 
-- Fix windows client (was not eating \r and doing Bad Things)
+**Fixed bugs:**
 
-## 0.5 (6/18/2014)
+- Unintelligible error when CHEF\_DRIVER unset or invalid [\#5](https://github.com/chef/chef-provisioning-vagrant/issues/5)
 
-- add dependency on chef-provisioning (now that chef-provisioning doesn't bring in chef-provisioning-vagrant by default)
+**Closed issues:**
 
-## 0.4 (6/3/2014)
+- machine destory not calling 'vagrant destroy vm-name' [\#13](https://github.com/chef/chef-provisioning-vagrant/issues/13)
+- Undefined method '\[\]' for nil:NilClass when running two provisioning recipes in one chef-client session [\#12](https://github.com/chef/chef-provisioning-vagrant/issues/12)
+- project description on github still refers to chef-metal [\#10](https://github.com/chef/chef-provisioning-vagrant/issues/10)
+- tag/release for 0.6.1 [\#6](https://github.com/chef/chef-provisioning-vagrant/issues/6)
 
-- @doubt72 Explicitly supported parallelization
-- Adjust to chef-provisioning 0.11 Driver interface
+**Merged pull requests:**
 
-## 0.3.1 (5/1/2014)
+- Update driver.rb [\#14](https://github.com/chef/chef-provisioning-vagrant/pull/14) ([kramvan1](https://github.com/kramvan1))
 
-- chef-provisioning 0.10 bugfixes
+## [v0.8.1](https://github.com/chef/chef-provisioning-vagrant/tree/v0.8.1) (2014-11-05)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.8...v0.8.1)
 
-## 0.3 (5/1/2014)
+## [v0.8](https://github.com/chef/chef-provisioning-vagrant/tree/v0.8) (2014-11-05)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.7...v0.8)
 
-- React to chef-provisioning 0.10 storing with_provisioner in the run context
+**Merged pull requests:**
 
-## 0.2 (4/11/2014)
+- Work with Chef 12 [\#9](https://github.com/chef/chef-provisioning-vagrant/pull/9) ([jkeiser](https://github.com/jkeiser))
+- rename gemspec provisioning et al. [\#8](https://github.com/chef/chef-provisioning-vagrant/pull/8) ([patrick-wright](https://github.com/patrick-wright))
 
-- Support chef_server_timeout
+## [v0.7](https://github.com/chef/chef-provisioning-vagrant/tree/v0.7) (2014-11-01)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.6...v0.7)
+
+## [v0.6](https://github.com/chef/chef-provisioning-vagrant/tree/v0.6) (2014-08-18)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.5...v0.6)
+
+**Closed issues:**
+
+- Vagrant networking [\#3](https://github.com/chef/chef-provisioning-vagrant/issues/3)
+
+**Merged pull requests:**
+
+- Fix vagrant parsing to work on Windows \(accept \r\) [\#4](https://github.com/chef/chef-provisioning-vagrant/pull/4) ([jkeiser](https://github.com/jkeiser))
+
+## [v0.5](https://github.com/chef/chef-provisioning-vagrant/tree/v0.5) (2014-06-18)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.4...v0.5)
+
+## [v0.4](https://github.com/chef/chef-provisioning-vagrant/tree/v0.4) (2014-06-04)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.4.beta.2...v0.4)
+
+## [v0.4.beta.2](https://github.com/chef/chef-provisioning-vagrant/tree/v0.4.beta.2) (2014-05-31)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.4.beta...v0.4.beta.2)
+
+## [v0.4.beta](https://github.com/chef/chef-provisioning-vagrant/tree/v0.4.beta) (2014-05-23)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.3.1...v0.4.beta)
+
+**Merged pull requests:**
+
+- Dt/vagrant parallel [\#2](https://github.com/chef/chef-provisioning-vagrant/pull/2) ([doubt72](https://github.com/doubt72))
+
+## [v0.3.1](https://github.com/chef/chef-provisioning-vagrant/tree/v0.3.1) (2014-05-02)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.3...v0.3.1)
+
+## [v0.3](https://github.com/chef/chef-provisioning-vagrant/tree/v0.3) (2014-05-01)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.2...v0.3)
+
+**Merged pull requests:**
+
+- Fix wrong provisionner name from Fog to Vagrant [\#1](https://github.com/chef/chef-provisioning-vagrant/pull/1) ([humboldtux](https://github.com/humboldtux))
+
+## [v0.2](https://github.com/chef/chef-provisioning-vagrant/tree/v0.2) (2014-04-11)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.1...v0.2)
+
+## [v0.1](https://github.com/chef/chef-provisioning-vagrant/tree/v0.1) (2014-04-04)
+
+
+\* *This Change Log was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*
