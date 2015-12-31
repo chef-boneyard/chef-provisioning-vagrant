@@ -59,5 +59,20 @@ end
 ```
 **Note: even though the bento based boxes appear as 'vmware_desktop', 'vmware_fusion' is required here, as it is the name of the vagrant provider**
 
+You can also add a ```vagrant_config``` attribute to specify provider specific options. For example, to specify a memory setting of 1536 MB in a virtual box provider:
+```
+options = {
+  vagrant_config: "config.vm.provider \"virtualbox\" do |vb|\n  vb.memory = 1536\nend\n",
+  vagrant_options: {
+    'vm.box' => 'opscode-centos-6.4'
+  }
+}
+
+machine 'marley' do
+  machine_options options
+  converge true
+end
+```
+
 # Known Issues
 It would be really nice to do some magic to make the vmware_fusion vs vmware_desktop providers match in the machine_options and the vagrant_box resource, but some magic would happen there...
