@@ -10,6 +10,7 @@ coverage
 doc/
 lib/bundler/man
 pkg
+bin
 rdoc
 spec/reports
 test/tmp

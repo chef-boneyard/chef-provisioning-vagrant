@@ -1,7 +1,14 @@
 # Change Log
 
-## [0.11.0](https://github.com/chef/chef-provisioning-vagrant/tree/0.11.0) (2015-10-21)
-[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.10.0...0.11.0)
+## [0.12.0](https://github.com/chef/chef-provisioning-vagrant/tree/0.12.0) (2016-02-03)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.11.0...0.12.0)
+
+**Fixed bugs:**
+
+- Allow box\_exists? to return a reasonable value when no vagrant boxes are installed [\#32](https://github.com/chef/chef-provisioning-vagrant/pull/32) ([http-418](https://github.com/http-418))
+
+## [v0.11.0](https://github.com/chef/chef-provisioning-vagrant/tree/v0.11.0) (2015-10-21)
+[Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.10.0...v0.11.0)
 
 **Fixed bugs:**
 
