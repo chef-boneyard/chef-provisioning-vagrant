@@ -36,6 +36,13 @@ options = {
     # Vagrantfile:
     'vm.network' => ':forwarded_port, guest: 80, host: 8080'
   },
+  # `vagrant_config` gets appended to the Vagrantfile
+  vagrant_config: <<EOF
+    config.vm.provider 'virtualbox' do |v|
+      v.memory = 4096
+      v.cpus = 2
+    end
+  EOF
 }
 
 machine 'marley' do
