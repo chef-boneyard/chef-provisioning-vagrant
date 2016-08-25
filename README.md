@@ -32,9 +32,14 @@ An example of machine options would be as follows:
 options = {
   vagrant_options: {
     'vm.box' => 'opscode-centos-6.4',
-    # becomes vm.network(:forwarded_port, guest: 80, host: 8080) in
-    # Vagrantfile:
-    'vm.network' => ':forwarded_port, guest: 80, host: 8080'
+    # becomes 
+    # config.vm.network(:private_network, {ip: "22.22.22.22"})
+    # config.vm.network(:forwarded_port, guest: 4001, host: 4001)
+    # in Vagrantfile:
+    'vm.network' => [
+      ':private_network, {ip: "192.168.33.34"}',
+      ':forwarded_port, guest: 4001, host: 4001'
+    ]
   },
   # `vagrant_config` gets appended to the Vagrantfile
   vagrant_config: <<EOF
