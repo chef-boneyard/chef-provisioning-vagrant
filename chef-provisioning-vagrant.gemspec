@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.summary = 'Driver for creating Vagrant instances in Chef Provisioning.'
   s.description = s.summary
   s.author = 'John Keiser'
-  s.email = 'jkeiser@getchef.com'
+  s.email = 'jkeiser@chef.io'
   s.homepage = 'https://github.com/chef/chef-provisioning-vagrant'
 
   s.add_dependency 'chef-provisioning'
