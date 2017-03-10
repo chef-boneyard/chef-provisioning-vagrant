@@ -61,7 +61,7 @@ class Chef
             }
             machine_spec.location['needs_reload'] = true if vm_file_updated
             if machine_options[:vagrant_options]
-              %w(vm.guest winrm.host winrm.port winrm.username winrm.password).each do |key|
+              %w(vm.guest winrm.host winrm.port winrm.transport winrm.username winrm.password).each do |key|
                 machine_spec.location[key] = machine_options[:vagrant_options][key] if machine_options[:vagrant_options][key]
               end
             end
@@ -412,14 +412,14 @@ class Chef
           port = machine_spec.location['winrm.port'] || 5985
           port = forwarded_ports[port] if forwarded_ports[port]
           endpoint = "http://#{hostname}:#{port}/wsman"
-          type = :plaintext
+          type = machine_spec.location['winrm.transport'] || :plaintext
           options = {
             :user => machine_spec.location['winrm.username'] || 'vagrant',
             :pass => machine_spec.location['winrm.password'] || 'vagrant',
             :disable_sspi => true
           }
 
-          Chef::Provisioning::Transport::WinRM.new(endpoint, type, options)
+          Chef::Provisioning::Transport::WinRM.new(endpoint, type, options, config)
         end
 
         def create_ssh_transport(machine_spec)
