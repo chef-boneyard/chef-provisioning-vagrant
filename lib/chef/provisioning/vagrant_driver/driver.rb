@@ -4,6 +4,7 @@ require 'chef/provisioning/machine/windows_machine'
 require 'chef/provisioning/machine/unix_machine'
 require 'chef/provisioning/convergence_strategy/install_msi'
 require 'chef/provisioning/convergence_strategy/install_cached'
+require 'chef/provisioning/convergence_strategy/install_sh'
 require 'chef/provisioning/transport/winrm'
 require 'chef/provisioning/transport/ssh'
 require 'chef/provisioning/vagrant_driver/version'
@@ -381,9 +382,12 @@ class Chef
           if machine_spec.location['vm.guest'].to_s == 'windows'
             Chef::Provisioning::ConvergenceStrategy::InstallMsi.
                                                 new(machine_options[:convergence_options], config)
-          else
+          elsif machine_options[:cached_installer] == true
             Chef::Provisioning::ConvergenceStrategy::InstallCached.
                                              new(machine_options[:convergence_options], config)
+          else
+            Chef::Provisioning::ConvergenceStrategy::InstallSh.
+                                            new(machine_options[:convergence_options], config)
           end
         end
 
