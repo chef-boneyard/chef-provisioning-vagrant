@@ -1,15 +1,15 @@
-require 'chef/resource/lwrp_base'
-require 'chef/provisioning/vagrant_driver'
+require "chef/resource/lwrp_base"
+require "chef/provisioning/vagrant_driver"
 
 class Chef::Resource::VagrantBox < Chef::Resource::LWRPBase
-  self.resource_name = 'vagrant_box'
+  self.resource_name = "vagrant_box"
 
   actions :create, :delete, :nothing
   default_action :create
 
   attribute :name, :kind_of => String, :name_attribute => true
   attribute :url, :kind_of => String
-  attribute :vagrant_provider, :kind_of => String, :default => 'virtualbox'
+  attribute :vagrant_provider, :kind_of => String, :default => "virtualbox"
   attribute :driver_options, :kind_of => Hash
 
   def after_created

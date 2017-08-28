@@ -1,0 +1,11 @@
+Lint/NestedMethodDefinition:
+  Exclude:
+    - 'spec/vagrant_support.rb'
+
+Lint/UnderscorePrefixedVariableName:
+  Exclude:
+    - 'lib/chef/provisioning/vagrant_driver/driver.rb'
+
+Performance/RedundantMatch:
+  Exclude:
+    - 'lib/chef/provisioning/vagrant_driver/driver.rb'

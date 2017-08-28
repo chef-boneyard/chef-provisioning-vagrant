@@ -1,14 +1,13 @@
-# this puts us into Travis's container-based infrastructure.
 sudo: false
-
 language: ruby
+branches:
+  only:
+    - master
 rvm:
-- 2.1.9
-- 2.2.5
-- 2.3.1
+  - 2.2.7
+  - 2.3.3
+  - 2.4.1
 script:
   - bundle exec rake build
   - bundle exec rspec
-notifications:
-  slack:
-    secure: Q6ZevGs06tO+2mGavVg9p1KKPSoi0tC17ZmDh3muzXHw76KSsBsZz1d+2e/ttuTrFsA2QxWXNH6i6zKbq92VE0/gjEQEE8AbkcaPOJKyuVdPlAJ0imbfTs1VEoGbeJch8w4fs/5ZFKnzY79DgZtHGtQnVudbRRNlDoHezyIgwLw=
+  - bundle exec chefstyle
