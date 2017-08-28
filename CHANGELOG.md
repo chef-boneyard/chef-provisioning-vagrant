@@ -1,10 +1,14 @@
 # Change Log
 
-## [0.12.0](https://github.com/chef/chef-provisioning-vagrant/tree/0.12.0) (2016-02-03)
+## [0.12.0](https://github.com/chef/chef-provisioning-vagrant/tree/0.12.0) (2017-08-28)
 [Full Changelog](https://github.com/chef/chef-provisioning-vagrant/compare/v0.11.0...0.12.0)
 
 **Fixed bugs:**
 
+- Added 'provides :vagrant\_cluster' to fix Chef 13 compatibility [\#50](https://github.com/chef/chef-provisioning-vagrant/pull/50) ([imriss](https://github.com/imriss))
+- Customize `winrm.transport` option and add `InstalSh` convergence strategy [\#47](https://github.com/chef/chef-provisioning-vagrant/pull/47) ([rjaros87](https://github.com/rjaros87))
+- Update README with example for multiple forwarded ports [\#43](https://github.com/chef/chef-provisioning-vagrant/pull/43) ([SathyaBhat](https://github.com/SathyaBhat))
+- Add example vagrant\_config in README [\#40](https://github.com/chef/chef-provisioning-vagrant/pull/40) ([steversmith](https://github.com/steversmith))
 - Allow box\_exists? to return a reasonable value when no vagrant boxes are installed [\#32](https://github.com/chef/chef-provisioning-vagrant/pull/32) ([http-418](https://github.com/http-418))
 
 ## [v0.11.0](https://github.com/chef/chef-provisioning-vagrant/tree/v0.11.0) (2015-10-21)
