@@ -2,7 +2,7 @@ require 'chef/provider/lwrp_base'
 require 'chef/mixin/shell_out'
 
 class Chef::Provider::VagrantBox < Chef::Provider::LWRPBase
-
+  provides :vagrant_box
   use_inline_resources
 
   include Chef::Mixin::ShellOut

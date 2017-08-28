@@ -2,7 +2,7 @@ require 'chef/provider/lwrp_base'
 require 'cheffish'
 
 class Chef::Provider::VagrantCluster < Chef::Provider::LWRPBase
-
+  provides :vagrant_cluster
   use_inline_resources
 
   def whyrun_supported?
