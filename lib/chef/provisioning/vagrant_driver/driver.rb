@@ -223,10 +223,10 @@ class Chef
             merged_vagrant_options = Cheffish::MergedConfig.new(machine_options[:vagrant_options], merged_vagrant_options)
           end
           merged_vagrant_options.each_pair do |key, value|
-            if key == 'vm.network'
-              vm_networks = [value].flatten
-              vm_networks.each do |network|
-                vm_file_content << "    config.#{key}(#{network})\n"
+            if key == 'vm.network' || key == 'vm.synced_folder'
+              settings = [value].flatten
+              settings.each do |setting|
+                vm_file_content << "    config.#{key}(#{setting})\n"
               end
             else
               vm_file_content << "    config.#{key} = #{value.inspect}\n"
