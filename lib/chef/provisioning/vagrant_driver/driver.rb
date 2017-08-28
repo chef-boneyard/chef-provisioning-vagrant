@@ -4,6 +4,7 @@ require 'chef/provisioning/machine/windows_machine'
 require 'chef/provisioning/machine/unix_machine'
 require 'chef/provisioning/convergence_strategy/install_msi'
 require 'chef/provisioning/convergence_strategy/install_cached'
+require 'chef/provisioning/convergence_strategy/install_sh'
 require 'chef/provisioning/transport/winrm'
 require 'chef/provisioning/transport/ssh'
 require 'chef/provisioning/vagrant_driver/version'
@@ -61,7 +62,7 @@ class Chef
             }
             machine_spec.location['needs_reload'] = true if vm_file_updated
             if machine_options[:vagrant_options]
-              %w(vm.guest winrm.host winrm.port winrm.username winrm.password).each do |key|
+              %w(vm.guest winrm.host winrm.port winrm.transport winrm.username winrm.password).each do |key|
                 machine_spec.location[key] = machine_options[:vagrant_options][key] if machine_options[:vagrant_options][key]
               end
             end
@@ -381,9 +382,12 @@ class Chef
           if machine_spec.location['vm.guest'].to_s == 'windows'
             Chef::Provisioning::ConvergenceStrategy::InstallMsi.
                                                 new(machine_options[:convergence_options], config)
-          else
+          elsif machine_options[:cached_installer] == true
             Chef::Provisioning::ConvergenceStrategy::InstallCached.
                                              new(machine_options[:convergence_options], config)
+          else
+            Chef::Provisioning::ConvergenceStrategy::InstallSh.
+                                            new(machine_options[:convergence_options], config)
           end
         end
 
@@ -412,14 +416,14 @@ class Chef
           port = machine_spec.location['winrm.port'] || 5985
           port = forwarded_ports[port] if forwarded_ports[port]
           endpoint = "http://#{hostname}:#{port}/wsman"
-          type = :plaintext
+          type = machine_spec.location['winrm.transport'] || :plaintext
           options = {
             :user => machine_spec.location['winrm.username'] || 'vagrant',
             :pass => machine_spec.location['winrm.password'] || 'vagrant',
             :disable_sspi => true
           }
 
-          Chef::Provisioning::Transport::WinRM.new(endpoint, type, options)
+          Chef::Provisioning::Transport::WinRM.new(endpoint, type, options, config)
         end
 
         def create_ssh_transport(machine_spec)
