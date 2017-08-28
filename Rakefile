@@ -1,8 +1,8 @@
-require 'bundler'
-require 'bundler/gem_tasks'
+require "bundler"
+require "bundler/gem_tasks"
 
 task :spec do
-  require File.expand_path('spec/run')
+  require File.expand_path("spec/run")
 end
 
 require "github_changelog_generator/task"

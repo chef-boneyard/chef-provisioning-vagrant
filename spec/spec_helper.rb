@@ -1,5 +1,5 @@
-require 'vagrant_support'
-require 'chef/provisioning'
+require "vagrant_support"
+require "chef/provisioning"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

@@ -7,7 +7,7 @@ module VagrantSupport
   #   extend VagrantSupport
   #   include VagrantConfig   # optional, gives you a `chef_config` object.
 
-  require 'cheffish/rspec/chef_run_support'
+  require "cheffish/rspec/chef_run_support"
 
   # when you `extend VagrantSupport`, your RSpec-context-extending-`VagrantSupport` with then
   # further `extend ChefRunSupport` to acquire all of the latter's Lucky Charms.
@@ -22,7 +22,6 @@ module VagrantSupport
   # then giving *that* to a Cheffish method which will run it for you in the context of a local chef-zero.
 
   def with_vagrant(description, *tags, &block)
-
     # take the block you just passed in, and make a new Proc that will call it after loading the driver...
     context_block = proc do
       vagrant_driver = Chef::Provisioning.driver_for_url("vagrant")
